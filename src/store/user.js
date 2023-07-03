@@ -4,7 +4,7 @@ export default ({
     state: {
         id: "",
         name: "",
-        token: "",
+        jwtToken: "",
         role: "",
         enable: "",
         is_login: false,
@@ -20,12 +20,12 @@ export default ({
             state.enable = user.enable;
         },
         updateToken(state, token) {
-            state.token = token;
+            state.jwtToken = token;
         },
         logout(state) {
             state.id = "";
             state.name = "";
-            state.token = "";
+            state.jwtToken = "";
             state.role = "";
             state.enable = "";
             state.is_login = false;
@@ -45,7 +45,10 @@ export default ({
                         localStorage.setItem("data", JSON.stringify(resp.data));
                         context.commit("updateToken", resp.data.jwtToken);
                         context.commit("updateUser", {
-                            ...resp.data,
+                            id: resp.data.id,
+                            role: resp.data.role,
+                            name: resp.data.name,
+                            enable: resp.data.enable,
                             is_login: true,
                         });
                         data.success(resp);
@@ -59,8 +62,12 @@ export default ({
         },
         getinfo(context, resp) {
             let data = JSON.parse(localStorage.getItem("data"));
+            context.commit("updateToken", data.jwtToken);
             context.commit("updateUser", {
-                ...data,
+                id: data.id,
+                role: data.role,
+                name: data.name,
+                enable: data.enable,
                 is_login: true,
             })
             resp.success();

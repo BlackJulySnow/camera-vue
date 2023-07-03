@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import HomeView from '@/views/home/HomeView.vue';
+import NotFound from '@/views/404/NotFound.vue';
+import VideoView from '@/views/video/VideoView.vue';
 import UserLoginView from '@/views/user/UserLoginView.vue';
 import UserRegisterView from '@/views/user/UserRegisterView.vue';
 import UserManagementView from '@/views/admin/UserManagementView.vue'
@@ -14,21 +15,22 @@ import store from '@/store'
 const routes = [{
         path: '/',
         name: "home",
-        redirect: "/home/",
+        redirect: "/admin/goods",
         meta: {
             requestAuth: true,
-            title: "主页",
+            title: "订单管理",
         }
     },
     {
-        path: "/home/",
-        name: "home_index",
-        component: HomeView,
+        path: "/video/:id",
+        name: "video_view",
+        component: VideoView,
         meta: {
             requestAuth: true,
-            title: "主页",
+            title: "视频预览",
         }
-    }, {
+    },
+    {
         path: '/user/login/',
         name: "user_login",
         component: UserLoginView,
@@ -61,7 +63,7 @@ const routes = [{
         component: CameraManagementView,
         meta: {
             requestAuth: true,
-            title: "监控管理",
+            title: "录像机管理",
         }
     },
     {
@@ -88,7 +90,7 @@ const routes = [{
         component: GoodsManagementView,
         meta: {
             requestAuth: true,
-            title: "商品管理",
+            title: "订单管理",
         }
     },
     {
@@ -99,6 +101,18 @@ const routes = [{
             requestAuth: true,
             title: "视频管理",
         }
+    },
+    {
+        path: "/404/",
+        name: "404",
+        component: NotFound,
+        meta: {
+            requestAuth: false,
+        }
+    },
+    {
+        path: "/:catchAll(.*)",
+        redirect: "/404/",
     }
 ]
 

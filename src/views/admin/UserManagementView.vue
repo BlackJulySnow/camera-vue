@@ -22,8 +22,8 @@
                                 </el-form-item>
                                 <el-form-item label="权限">
                                     <el-select v-model="form.role" class="m-2" placeholder="Select">
-                                        <el-option label="管理员" value="ROLE_ADMIN" />
-                                        <el-option label="普通用户" value="ROLE_USER" />
+                                        <el-option v-for="role in userRole" :key="role.value" :label="role.label"
+                                            :value="role.value" />
                                     </el-select>
                                 </el-form-item>
                             </el-form>
@@ -39,9 +39,14 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    <el-table :data="userList" style="width: 100%" height="540">
-                        <el-table-column prop="id" label="工号" sortable />
-                        <el-table-column prop="name" label="姓名" sortable />
+                    <el-table :data="userList" style="width: 100%" height="540" @sort-change="sortChange">
+                        <el-table-column label="序号">
+                            <template #default="scope">
+                                {{ (current_page - 1) * pageSize + scope.$index + 1 }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="id" label="工号" sortable="custom" />
+                        <el-table-column prop="name" label="姓名" sortable="custom" />
                         <el-table-column prop="enable" label="是否启用">
                             <template #default="scope">
                                 <el-switch class="ml-2" v-model="scope.row.enable" disabled
@@ -77,8 +82,8 @@
                         </el-form-item>
                         <el-form-item label="权限">
                             <el-select v-model="form.role" class="m-2" placeholder="Select">
-                                <el-option label="管理员" value="ROLE_ADMIN" />
-                                <el-option label="普通用户" value="ROLE_USER" />
+                                <el-option v-for="role in userRole" :key="role.value" :label="role.label"
+                                    :value="role.value" />
                             </el-select>
                         </el-form-item>
                     </el-form>
@@ -150,6 +155,23 @@ export default {
             })
         }
 
+        const sortChange = (column) => {
+            const prop = column.prop
+            if (prop) {
+                if (column.order == 'ascending') {
+                    desc.value = false;
+                    sortBy.value = prop
+                } else if (column.order == 'descending') {
+                    desc.value = true;
+                    sortBy.value = prop
+                } else if (column.order == null) {
+                    sortBy.value = 'id'
+                    desc.value = false;
+                }
+                select();
+            }
+        }
+
         select();
         return {
             Edit,
@@ -164,6 +186,7 @@ export default {
             current_page,
             userRole,
             select,
+            sortChange,
         }
     },
     methods: {
@@ -198,7 +221,7 @@ export default {
                     message(resp.msg, 'warning');
                 }
                 that.addDialog = false;
-                that.select(1, that.key);
+                that.select();
             }, function error() {
                 message('添加失败', 'error');
             })
@@ -209,7 +232,7 @@ export default {
                 id: id,
             }, function success(resp) {
                 if (resp.code == '200') {
-                    that.select(1, that.key);
+                    that.select();
                     message('删除成功', 'success');
                 }
             }, function error() {
@@ -231,7 +254,7 @@ export default {
                     message(resp.msg, 'warning');
                 }
                 that.editDialog = false;
-                that.select(1, that.key);
+                that.select();
             }, function error() {
                 message('修改失败', 'error');
             })
@@ -252,9 +275,9 @@ export default {
                 this.handleClose();
             }
         },
-        key(newV) {
+        key() {
             const that = this;
-            that.select(1, newV);
+            that.select();
         },
         editDialog(newV) {
             if (newV === false) {
@@ -262,7 +285,7 @@ export default {
             }
         },
         pageSize() {
-            this.select(1, this.key);
+            this.select();
         }
     }
 }

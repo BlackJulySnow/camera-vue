@@ -4,7 +4,8 @@
         <div class="col-8">
             <div class="card">
                 <div class="card-header text-center">
-                    <h3>工位管理<el-button class="float-end" type="primary" plain @click="addDialog = true">编辑工位信息</el-button>
+                    <h3>工位管理
+                        <el-button class="float-end" type="primary" plain @click="addDialog = true">新增</el-button>
                         <el-dialog v-model="addDialog" title="新增" width="30%" @close="handleClear">
                             <el-form label-position="right" label-width="100px" :model="form" style="max-width: 460px">
                                 <el-form-item label="工位IP">
@@ -13,8 +14,8 @@
                                 <el-form-item label="工位名称">
                                     <el-input v-model="form.stationName" />
                                 </el-form-item>
-                                <el-form-item label="监控">
-                                    <el-select v-model="form.cameraId" placeholder="选择监控">
+                                <el-form-item label="录像机">
+                                    <el-select v-model="form.cameraId" placeholder="选择录像机">
                                         <el-option v-for="camera in cameraList" :key="camera.id" :label="camera.ip"
                                             :value="camera.id" />
                                     </el-select>
@@ -111,6 +112,23 @@ export default {
             })
         }
 
+        const sortChange = (column) => {
+            const prop = column.prop
+            if (prop) {
+                if (column.order == 'ascending') {
+                    desc.value = false;
+                    sortBy.value = prop
+                } else if (column.order == 'descending') {
+                    desc.value = true;
+                    sortBy.value = prop
+                } else if (column.order == null) {
+                    sortBy.value = 'id'
+                    desc.value = false;
+                }
+                select();
+            }
+        }
+
         const findAllCamera = () => {
             postRequest("/camera/findAllIdAndIP", {},
                 function success(resp) {
@@ -142,6 +160,7 @@ export default {
             Delete,
             Edit,
 
+            sortChange,
             select,
         }
     },
@@ -237,6 +256,18 @@ export default {
             }, function error() {
                 message('修改失败', 'error');
             })
+        },
+        status(value) {
+            let last = new Date(value);
+            let now = new Date();
+            let state;
+            let d = parseInt((now - last) / 1000 / 60);
+            if (d >= 5) {
+                state = false;
+            } else {
+                state = true;
+            }
+            return state;
         }
     },
     watch: {
