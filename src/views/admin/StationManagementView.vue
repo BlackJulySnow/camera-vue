@@ -45,7 +45,6 @@
                     <el-table :data="stationList" style="width: 100%" height="540">
                         <el-table-column prop="stationName" label="工位名称" sortable />
                         <el-table-column prop="stationIp" label="工位IP" sortable />
-                        <!-- <el-table-column prop="" lable="在线状况" :formatter=""/> -->
                         <el-table-column width="200" align="right">
                             <template #default="scope">
                                 <el-button type="primary" :icon="Edit" circle @click="edit(scope.row)" />

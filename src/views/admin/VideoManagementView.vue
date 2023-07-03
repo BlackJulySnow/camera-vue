@@ -55,7 +55,7 @@
                     align-center>
                     <video controls autoplay ref="dialogVideo">
                         <source :src="'http://127.0.0.1/video/stream/' + video_id" type='video/mp4'>
-                        <!--                      <source src="http://127.0.0.1:8083/video/stream/mp4/toystory" type="video/mp4">-->
+<!--                      <source src="http://127.0.0.1:8083/video/stream/mp4/toystory" type="video/mp4">-->
                     </video>
                 </el-dialog>
             </div>
@@ -191,4 +191,8 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+/deep/ .el-dialog {
+    height: 50%;
+}
+</style>
