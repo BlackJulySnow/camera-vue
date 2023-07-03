@@ -191,4 +191,8 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+/deep/ .el-dialog {
+    height: 50%;
+}
+</style>
