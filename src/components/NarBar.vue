@@ -3,7 +3,7 @@
         <div class="container">
             <router-link class="navbar-brand" :to="{ name: 'home' }">
                 <img src="@/assets/logo.png" alt="" width="28" height="28" class="d-inline-block align-text-top">
-                监控回溯系统
+                货查查视频追溯系统
             </router-link>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
                 aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
@@ -11,9 +11,32 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item md-2">
-                        <router-link :class="route_name == 'home_index' ? 'nav-link active mleft' : 'mleft nav-link'"
-                            aria-current="page" :to="{ name: 'home_index' }">主页</router-link>
+                    <li class="nav-item md-2"
+                        v-if="$store.state.user.role == 'ROLE_ADMIN' || $store.state.user.role == 'ROLE_MANAGE'">
+                        <router-link
+                            :class="route_name == 'admin_goods_management' ? 'nav-link active mleft' : 'mleft nav-link'"
+                            aria-current="page" :to="{ name: 'admin_goods_management' }">
+                            订单管理</router-link>
+                    </li>
+                    <li class="nav-item md-2"
+                        v-if="$store.state.user.role == 'ROLE_ADMIN' || $store.state.user.role == 'ROLE_MANAGE'">
+                        <router-link
+                            :class="route_name == 'admin_video_management' ? 'nav-link active mleft' : 'mleft nav-link'"
+                            aria-current="page" :to="{ name: 'admin_video_management' }">
+                            视频管理</router-link>
+                    </li>
+                    <li class="nav-item md-2"
+                        v-if="$store.state.user.role == 'ROLE_ADMIN' || $store.state.user.role == 'ROLE_MANAGE'">
+                        <router-link
+                            :class="route_name == 'admin_station_management' ? 'nav-link active mleft' : 'mleft nav-link'"
+                            aria-current="page" :to="{ name: 'admin_station_management' }">
+                            工位管理</router-link>
+                    </li>
+                    <li class="nav-item md-2" v-if="$store.state.user.role == 'ROLE_ADMIN'">
+                        <router-link
+                            :class="route_name == 'admin_camera_management' ? 'nav-link active mleft' : 'mleft nav-link'"
+                            aria-current="page" :to="{ name: 'admin_camera_management' }">
+                            录像机管理</router-link>
                     </li>
                     <li class="nav-item md-2" v-if="$store.state.user.role == 'ROLE_ADMIN'">
                         <router-link
@@ -23,33 +46,9 @@
                     </li>
                     <li class="nav-item md-2" v-if="$store.state.user.role == 'ROLE_ADMIN'">
                         <router-link
-                            :class="route_name == 'admin_camera_management' ? 'nav-link active mleft' : 'mleft nav-link'"
-                            aria-current="page" :to="{ name: 'admin_camera_management' }">
-                            监控管理</router-link>
-                    </li>
-                    <li class="nav-item md-2" v-if="$store.state.user.role == 'ROLE_ADMIN'">
-                        <router-link
                             :class="route_name == 'admin_license_management' ? 'nav-link active mleft' : 'mleft nav-link'"
                             aria-current="page" :to="{ name: 'admin_license_management' }">
-                            授权管理</router-link>
-                    </li>
-                    <li class="nav-item md-2" v-if="$store.state.user.role == 'ROLE_ADMIN'">
-                        <router-link
-                            :class="route_name == 'admin_station_management' ? 'nav-link active mleft' : 'mleft nav-link'"
-                            aria-current="page" :to="{ name: 'admin_station_management' }">
-                            工位管理</router-link>
-                    </li>
-                    <li class="nav-item md-2" v-if="$store.state.user.role == 'ROLE_ADMIN'">
-                        <router-link
-                            :class="route_name == 'admin_goods_management' ? 'nav-link active mleft' : 'mleft nav-link'"
-                            aria-current="page" :to="{ name: 'admin_goods_management' }">
-                            订单管理</router-link>
-                    </li>
-                    <li class="nav-item md-2" v-if="$store.state.user.role == 'ROLE_ADMIN'">
-                        <router-link
-                            :class="route_name == 'admin_video_management' ? 'nav-link active mleft' : 'mleft nav-link'"
-                            aria-current="page" :to="{ name: 'admin_video_management' }">
-                            视频管理</router-link>
+                            系统设置</router-link>
                     </li>
                 </ul>
                 <ul class="navbar-nav" v-if="$store.state.user.is_login">

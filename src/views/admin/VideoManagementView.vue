@@ -1,7 +1,7 @@
 <template>
     <div class="row" style="width:100%; margin-top:30px">
-        <div class="col-2"></div>
-        <div class="col-8">
+        <div class="col-1"></div>
+        <div class="col-10">
             <div class="card">
                 <div class="card-header text-center">
                     <h3>视频管理</h3>
@@ -26,23 +26,31 @@
                     </el-row>
                 </div>
                 <div class="card-body">
-                    <el-table style="width: 100%" height="540" :data="videoList">
-                        <el-table-column prop="createTime" label="创建时间" sortable :formatter="timeFormatter" />
-                        <el-table-column prop="startTime" label="开始时间" sortable :formatter="timeFormatter" />
-                        <el-table-column prop="endTime" label="结束时间" sortable :formatter="timeFormatter" />
-                        <el-table-column prop="renderStartTime" label="渲染开始时间" sortable :formatter="timeFormatter" />
-                        <el-table-column prop="renderEndTime" label="渲染结束时间" sortable :formatter="timeFormatter" />
-                        <el-table-column prop="state" label="视频状态" :formatter="stateFormatter" />
-                        <el-table-column align="right" width="120">
+                    <el-table style="width: 100%" height="540" :data="videoList" @sort-change="sortChange">
+                        <el-table-column label="序号" width="100">
                             <template #default="scope">
-                                <el-button type="success" :icon="VideoPlay" circle @click="play(scope.row.id)" />
-
-                                <el-button type="danger" :icon="Delete" circle @click="handleDelete(scope.row.id)" />
+                                {{ (current_page - 1) * pageSize + scope.$index + 1 }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="createTime" label="创建时间" sortable="costom" :formatter="timeFormatter" />
+                        <el-table-column prop="startTime" label="开始时间" sortable="costom" :formatter="timeFormatter" />
+                        <el-table-column prop="endTime" label="结束时间" sortable="costom" :formatter="timeFormatter" />
+                        <el-table-column prop="renderStartTime" label="渲染开始时间" sortable="costom"
+                            :formatter="timeFormatter" />
+                        <el-table-column prop="renderEndTime" label="渲染结束时间" sortable="costom" :formatter="timeFormatter" />
+                        <el-table-column prop="state" label="视频状态" :formatter="stateFormatter" />
+                        <el-table-column align="right">
+                            <template #default="scope">
+                                <el-button type="danger" @click="handleDelete(scope.row.id)"
+                                    v-if="scope.row.state != 4">删除</el-button>
+                                <el-button type="danger" @click="handleDelete(scope.row.id)" v-else>彻底删除</el-button>
+                                <el-button type="success" circle :icon="VideoPlay" @click="play(scope.row.id)"
+                                    :disabled="scope.row.state != 2" />
                             </template>
                         </el-table-column>
                     </el-table>
                 </div>
-                <div class="card-footer">
+                <!-- <div class="card-footer">
                     <el-row justify="center">
                         <el-row justify="center">
                             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="total"
@@ -55,9 +63,8 @@
                     align-center>
                     <video controls autoplay ref="dialogVideo">
                         <source :src="'http://127.0.0.1/video/stream/' + video_id" type='video/mp4'>
-                        <!--                      <source src="http://127.0.0.1:8083/video/stream/mp4/toystory" type="video/mp4">-->
                     </video>
-                </el-dialog>
+                </el-dialog> -->
             </div>
         </div>
     </div>
@@ -67,8 +74,9 @@
 import { postRequest } from '@/utils/http';
 import { message } from '@/utils/messageBox';
 import { ref } from 'vue';
-import { Search, Delete, VideoPlay } from '@element-plus/icons-vue'
+import { Search, VideoPlay } from '@element-plus/icons-vue'
 import { stateType } from '@/global'
+import router from '@/router/index'
 
 export default {
     setup() {
@@ -81,7 +89,6 @@ export default {
         let pageSize = ref(10);
         let sortBy = ref("id");
         let desc = ref(false);
-        let video_id = ref('');
         let playDialog = ref(false);
 
         const select = () => {
@@ -104,6 +111,24 @@ export default {
                 message(resp.msg, 'error');
             })
         }
+        const sortChange = (column) => {
+            const prop = column.prop
+            if (prop) {
+                if (column.order == 'ascending') {
+                    desc.value = false;
+                    sortBy.value = prop
+                } else if (column.order == 'descending') {
+                    desc.value = true;
+                    sortBy.value = prop
+                } else if (column.order == null) {
+                    sortBy.value = 'id'
+                    desc.value = false;
+                }
+                select();
+            }
+        }
+
+
         select();
 
         return {
@@ -114,12 +139,11 @@ export default {
             current_page,
             pageSize,
             select,
+            sortChange,
             Search,
             state,
             stateType,
-            Delete,
             playDialog,
-            video_id,
             VideoPlay,
         }
     },
@@ -184,11 +208,20 @@ export default {
             })
         },
         play(id) {
-            this.video_id = id
-            this.playDialog = true;
-        }
+            router.push({ name: 'video_view', params: { id: id } });
+        },
     },
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.card /deep/ .el-dialog {
+    height: 70%;
+}
+
+video {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+</style>

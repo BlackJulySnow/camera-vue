@@ -4,13 +4,13 @@
         <div class="col-8">
             <div class="card">
                 <div class="card-header text-center">
-                    <h3>监控管理<el-button class="float-end" type="primary" plain @click="addDialog = true">新增</el-button>
+                    <h3>录像机管理<el-button class="float-end" type="primary" plain @click="addDialog = true">新增</el-button>
                         <el-dialog v-model="addDialog" title="新增" width="30%">
                             <el-form label-position="right" label-width="100px" :model="form" style="max-width: 460px">
-                                <el-form-item label="监控ip">
+                                <el-form-item label="录像机ip">
                                     <el-input v-model="form.ip" />
                                 </el-form-item>
-                                <el-form-item label="监控端口">
+                                <el-form-item label="录像机端口">
                                     <el-input v-model="form.port" />
                                 </el-form-item>
                                 <el-form-item label="用户名">
@@ -41,29 +41,34 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    <el-table :data="cameraList" style="width: 100%" height="540">
-                        <el-table-column prop="ip" label="ip" sortable />
-                        <el-table-column prop="port" label="端口" sortable />
-                        <el-table-column prop="delay" label="回溯时间" sortable />
+                    <el-table :data="cameraList" style="width: 100%" height="540" @sort-change="sortChange">
+                        <el-table-column label="序号">
+                            <template #default="scope">
+                                {{ (current_page - 1) * pageSize + scope.$index + 1 }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="ip" label="ip" sortable="costom" />
+                        <el-table-column prop="port" label="端口" sortable="costom" />
+                        <el-table-column prop="delay" label="回溯时间" sortable="costom" />
                         <el-table-column prop="type" label="类型" :formatter="Formatter" />
                         <el-table-column prop="username" label="用户名" />
                         <el-table-column prop="password" label="密码" />
-                        <el-table-column width="190" align="right">
+                        <el-table-column width="300">
                             <template #default="scope">
+                                <el-button type="warning" round @click="channelSelect(scope.row.id)">通道编辑</el-button>
+                                <el-button type="warning" round @click="watermarkSelect(scope.row.id)">水印编辑</el-button>
                                 <el-button type="primary" :icon="Edit" circle @click="edit(scope.row)" />
                                 <el-button type="danger" :icon="Delete" circle @click="handleDelete(scope.row.id)" />
-                                <el-button type="info" :icon="Plus" circle @click="channelSelect(scope.row.id)" />
-                                <el-button type="info" :icon="Monitor" circle @click="watermarkSelect(scope.row.id)" />
                             </template>
                         </el-table-column>
                     </el-table>
                 </div>
                 <el-dialog v-model="editDialog" title="编辑" width="30%">
                     <el-form label-position="right" label-width="100px" :model="form" style="max-width: 460px">
-                        <el-form-item label="监控ip">
+                        <el-form-item label="录像机ip">
                             <el-input v-model="form.ip" />
                         </el-form-item>
-                        <el-form-item label="监控端口">
+                        <el-form-item label="录像机端口">
                             <el-input v-model="form.port" />
                         </el-form-item>
                         <el-form-item label="用户名">
@@ -238,12 +243,29 @@ export default {
                 if (resp.code == '200') {
                     total.value = resp.data.totalElements;
                     cameraList.value = resp.data.content;
-                }else{
-                  message(resp.msg, 'error');
+                } else {
+                    message(resp.msg, 'error');
                 }
             }, function error() {
                 message('摄像头查询失败', 'error');
             })
+        }
+
+        const sortChange = (column) => {
+            const prop = column.prop
+            if (prop) {
+                if (column.order == 'ascending') {
+                    desc.value = false;
+                    sortBy.value = prop
+                } else if (column.order == 'descending') {
+                    desc.value = true;
+                    sortBy.value = prop
+                } else if (column.order == null) {
+                    sortBy.value = 'id'
+                    desc.value = false;
+                }
+                select();
+            }
         }
 
         const channelSelect = (id) => {
@@ -285,6 +307,7 @@ export default {
             editChannel,
             channel,
             select,
+            sortChange,
             check1,
             check2,
             check3,

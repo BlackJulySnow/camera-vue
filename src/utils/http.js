@@ -8,7 +8,7 @@ export const postRequest = (url, params, success, error) => {
         data: params,
         type: "post",
         headers: {
-            Authorization: "Bearer " + store.state.user.token,
+            Authorization: "Bearer " + store.state.user.jwtToken,
         },
         success,
         error,
@@ -20,7 +20,7 @@ export const getRequest = (url, params, success, error) => {
         data: params,
         type: "get",
         headers: {
-            Authorization: "Bearer " + store.state.user.token,
+            Authorization: "Bearer " + store.state.user.jwtToken,
         },
         success,
         error,

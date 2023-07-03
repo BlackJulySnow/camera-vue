@@ -14,12 +14,12 @@
             <div class="overlay-container">
                 <div class="overlay">
                     <div class="overlay-panel overlay-left">
-                        <h1>监控回溯系统</h1>
+                        <h1>货查查视频追溯系统</h1>
                     </div>
                 </div>
             </div>
             <footer>
-                <p>肖鲁诺</p>
+                <p>汕头市展华信息科技有限公司</p>
             </footer>
         </div>
     </div>

@@ -27,7 +27,8 @@
                 </div>
                 <div class="card-body">
                     <el-table :data="lisenceList" style="width: 100%">
-                        <el-table-column prop="stationNum" label="工位数量" sortable />
+                        <el-table-column label="序号" type="index" width="100" />
+                        <el-table-column prop="channelNum" label="通道数量" sortable />
                         <el-table-column prop="expireTime" label="过期时间" sortable :formatter="timeFormatter" />
                         <el-table-column width="100" align="right">
                             <template #default="scope">
