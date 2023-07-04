@@ -2,7 +2,10 @@
     <div class="row" style="width:100%; margin-top:30px">
         <div class="col-2"></div>
         <div class="col-8">
-            <div class="card">
+            <el-card>
+                <p>当前系统时间：{{ time }}</p>
+            </el-card>
+            <div class="card mt-4">
                 <div class="card-header text-center">
                     <h3>授权管理<el-button class="float-end" type="primary" plain @click="addDialog = true">新增</el-button>
                         <el-dialog v-model="addDialog" title="新增" width="30%">
@@ -68,6 +71,39 @@ export default {
         let form = reactive({
             key: '',
         })
+
+        let timestamp = ref();
+        let time = ref('');
+        let timer;
+
+        const timestampToTime = (timestamp) => {
+            var date = new Date(timestamp);
+            var Y = date.getFullYear() + "-";
+            var M =
+                (date.getMonth() + 1 < 10
+                    ? "0" + (date.getMonth() + 1)
+                    : date.getMonth() + 1) + "-";
+            var D = (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " ";
+            var h = date.getHours().toString().padStart(2, 0) + ":";
+            var m = date.getMinutes().toString().padStart(2, 0) + ":";
+            var s = date.getSeconds().toString().padStart(2, 0);
+            return Y + M + D + h + m + s;
+        }
+
+        const getTime = () => {
+            getRequest("/config/systemTime", {},
+                function success(resp) {
+                    if (resp.code == '200') {
+                        timestamp.value = resp.data;
+                        time.value = timestampToTime(timestamp.value);
+                    } else {
+                        message(resp.msg, 'error');
+                    }
+                }, function error() {
+                    message('获取系统时间出错', 'error');
+                })
+        }
+
         const select = () => {
             postRequest("/license/selectAll", {},
                 function success(resp) {
@@ -82,6 +118,7 @@ export default {
             )
         }
         select();
+        getTime();
 
         return {
             lisenceList,
@@ -89,7 +126,11 @@ export default {
             getMachine,
             form,
             code,
+            time,
+            timer,
+            timestamp,
             select,
+            timestampToTime,
             Delete,
         }
     },
@@ -171,8 +212,16 @@ export default {
                 }
             });
             return format
-        }
-
+        },
+    },
+    created() {
+        this.timer = setInterval(() => {
+            this.timestamp += 1000;
+            this.time = this.timestampToTime(this.timestamp);
+        }, 1000)
+    },
+    beforeRouteLeave() {
+        clearInterval(this.timer);
     }
 }
 </script>

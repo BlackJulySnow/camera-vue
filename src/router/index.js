@@ -1,5 +1,4 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import NotFound from '@/views/404/NotFound.vue';
 import VideoView from '@/views/video/VideoView.vue';
 import UserLoginView from '@/views/user/UserLoginView.vue';
 import UserRegisterView from '@/views/user/UserRegisterView.vue';
@@ -101,18 +100,6 @@ const routes = [{
             requestAuth: true,
             title: "视频管理",
         }
-    },
-    {
-        path: "/404/",
-        name: "404",
-        component: NotFound,
-        meta: {
-            requestAuth: false,
-        }
-    },
-    {
-        path: "/:catchAll(.*)",
-        redirect: "/404/",
     }
 ]
 
