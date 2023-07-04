@@ -39,11 +39,14 @@
                             :formatter="timeFormatter" />
                         <el-table-column prop="renderEndTime" label="渲染结束时间" sortable="costom" :formatter="timeFormatter" />
                         <el-table-column prop="state" label="视频状态" :formatter="stateFormatter" />
-                        <el-table-column align="right">
+                        <el-table-column align="right" >
                             <template #default="scope">
+
                                 <el-button type="danger" @click="handleDelete(scope.row.id)"
                                     v-if="scope.row.state != 4">删除</el-button>
                                 <el-button type="danger" @click="handleDelete(scope.row.id)" v-else>彻底删除</el-button>
+                              <el-link target="_blank" :href="'/video/stream/' + scope.row.id" :disabled="scope.row.state != 2" :underline="false" style="margin: 0 10px" >
+                                <el-button type="success" :disabled="scope.row.state != 2" :icon="Download" circle></el-button></el-link>
                                 <el-button type="success" circle :icon="VideoPlay" @click="play(scope.row.id)"
                                     :disabled="scope.row.state != 2" />
                             </template>
@@ -59,7 +62,7 @@
 import { postRequest } from '@/utils/http';
 import { message } from '@/utils/messageBox';
 import { ref } from 'vue';
-import { Search, VideoPlay } from '@element-plus/icons-vue'
+import { Search, VideoPlay, Download } from '@element-plus/icons-vue'
 import { stateType } from '@/global'
 import router from '@/router/index'
 
@@ -130,6 +133,7 @@ export default {
             stateType,
             playDialog,
             VideoPlay,
+          Download,
         }
     },
     methods: {
