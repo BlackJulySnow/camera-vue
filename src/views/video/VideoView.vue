@@ -29,7 +29,7 @@ export default {
     },
     setup() {
         const route = useRoute();
-        let path = "http://127.0.0.1/video/stream/" + route.params.id;
+        let path = "/video/stream/" + route.params.id;
         const options = reactive({
             width: "100%", //播放器高度
             height: "100", //播放器高度
