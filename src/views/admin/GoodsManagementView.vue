@@ -39,7 +39,7 @@
                 <div class="card-body">
                     <el-table style="width: 100%" height="540" :data="goodsList" @sort-change="sortChange" ref="multiple"
                         @selection-change="handleSelectionChange">
-                        <el-table-column type="selection" width="55" />
+                        <el-table-column type="selection" width="55" :selectable="selectable" />
                         <el-table-column label="序号">
                             <template #default="scope">
                                 {{ (current_page - 1) * pageSize + scope.$index + 1 }}
@@ -89,7 +89,7 @@
                         <el-table-column prop="endTime" label="结束时间" sortable="costom" />
                         <el-table-column prop="state" label="视频状态" :formatter="stateFormatter" />
                         <el-table-column align="right">
-                            <template #header="scope">
+                            <template #header>
                                 <el-button type="primary" circle :icon="Refresh" @click="Fresh(videoId)" />
                             </template>
                             <template #default="scope">
@@ -299,6 +299,13 @@ export default {
             }, function error(resp) {
                 message(resp.msg, 'error');
             })
+        },
+        selectable(row) {
+            if (row.videos.length == 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
     },
 }

@@ -50,22 +50,6 @@
                         </el-table-column>
                     </el-table>
                 </div>
-                <!-- <div class="card-footer">
-                    <el-row justify="center">
-                        <el-row justify="center">
-                            <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="total"
-                                :current_page="current_page" :page-sizes="[10, 50, 100]" :page-size="pageSize"
-                                @current-change="handleCurrentChange" @size-change="handleSizeChange" />
-                        </el-row>
-                    </el-row>
-                </div>
-                <el-dialog title="视频预览" v-model="playDialog" width="50%" height="auto" @close="playDialog = false"
-                    align-center>
-                    <video controls autoplay ref="dialogVideo">
-                        <source :src="'http://127.0.0.1/video/stream/' + video_id" type='video/mp4'>
-<!--                      <source src="http://127.0.0.1:8083/video/stream/mp4/toystory" type="video/mp4">-->
-                    </video>
-                </el-dialog> -->
             </div>
         </div>
     </div>
@@ -216,7 +200,13 @@ export default {
 </script>
 
 <style scoped>
-/deep/ .el-dialog {
-    height: 50%;
+.card /deep/ .el-dialog {
+    height: 70%;
+}
+
+video {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
 }
 </style>

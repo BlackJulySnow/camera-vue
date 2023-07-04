@@ -49,7 +49,8 @@
                         </el-table-column>
                         <el-table-column prop="ip" label="ip" sortable="costom" />
                         <el-table-column prop="port" label="端口" sortable="costom" />
-                        <el-table-column prop="delay" label="回溯时间" sortable="costom" />
+                        <el-table-column prop="backtrack" label="回溯时间" sortable="costom" />
+                        <el-table-column prop="delay" label="延时" sortable="costom" />
                         <el-table-column prop="type" label="类型" :formatter="Formatter" />
                         <el-table-column prop="username" label="用户名" />
                         <el-table-column prop="password" label="密码" />
@@ -84,6 +85,9 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="回溯时间">
+                            <el-input v-model="form.backtrack" />
+                        </el-form-item>
+                        <el-form-item label="延时">
                             <el-input v-model="form.delay" />
                         </el-form-item>
                     </el-form>
@@ -131,11 +135,11 @@
             </span>
         </template>
     </el-dialog>
-    <el-dialog v-model="editWatermark" title="编辑水印" width="30%">
+    <el-dialog v-model="editWatermark" title="编辑水印" width="50%">
         <el-table :data="watermarkList" style="width: 100%" height="540">
-            <el-table-column prop="type" label="水印类型" />
-            <el-table-column prop="text" label="水印文字" />
-            <el-table-column prop="position" label="水印位置" />
+            <el-table-column prop="type" label="水印类型" :formatter="typeFormatter" />
+            <el-table-column prop="text" label="水印文字" :formatter="textFormatter" />
+            <el-table-column prop="position" label="水印位置" :formatter="positionFormatter" />
             <el-table-column width="100" align="right">
                 <template #default="scope">
                     <el-button type="danger" :icon="Delete" circle @click="watermarkDelete(scope.row.id)" />
@@ -176,9 +180,8 @@
                 <span class="ml-3 w-35 text-gray-600 inline-flex items-center">水印类型</span>
             </el-col>
             <el-col :span="20">
-                <el-checkbox v-model="check1" :disabled="checkboxDisabled">订单号</el-checkbox>
+                <el-checkbox v-model="check1" :disabled="checkboxDisabled">订单编号</el-checkbox>
                 <el-checkbox v-model="check2" :disabled="checkboxDisabled">工位</el-checkbox>
-                <el-checkbox v-model="check3" :disabled="checkboxDisabled">工号</el-checkbox>
             </el-col>
         </el-row>
         <template #footer>
@@ -207,6 +210,7 @@ export default {
             port: '',
             type: 0,
             delay: '',
+            backtrack: '',
         })
         let total = ref(0);
         let current_page = ref(1);
@@ -227,7 +231,6 @@ export default {
         let channel = ref('');
         let check1 = ref(false)
         let check2 = ref(false)
-        let check3 = ref(false)
         let position = ref(0)
         let watermark = ref('');
         let inputDisabled = ref(false);
@@ -310,7 +313,6 @@ export default {
             sortChange,
             check1,
             check2,
-            check3,
             position,
             watermark,
             cameraType,
@@ -336,6 +338,7 @@ export default {
             that.form.port = '';
             that.form.type = 0;
             that.form.delay = '';
+            that.form.backtrack = '';
         },
         Formatter(row) {
             if (row.type == 0) {
@@ -343,6 +346,10 @@ export default {
             } else if (row.type == 1) {
                 return "大华";
             }
+        },
+        positionFormatter(row) {
+            let Position = ['左上', '左下', '右上', '右下'];
+            return Position[row.position];
         },
         addCamera() {
             const that = this;
@@ -389,6 +396,7 @@ export default {
             that.form.port = camera.port;
             that.form.type = camera.type;
             that.form.delay = camera.delay;
+            that.form.backtrack = camera.backtrack;
             that.editDialog = true;
         },
         editUser() {
@@ -401,6 +409,7 @@ export default {
                 port: that.form.port,
                 type: that.form.type,
                 delay: that.form.delay,
+                backtrack: that.form.backtrack,
             }, function success(resp) {
                 if (resp.code == '200') {
                     message('修改成功', 'success');
@@ -481,14 +490,13 @@ export default {
             const that = this;
             postRequest("/watermark/add", {
                 camera_id: that.camera_id,
-                type: that.calc(that.check1, 1) | that.calc(that.check2, 2) | that.calc(that.check3, 3),
+                type: that.calc(that.check2, 1) | that.calc(that.check1, 2),
                 text: that.watermark,
                 position: that.position,
             }, function success(resp) {
                 if (resp.code == '200') {
                     that.check1 = false;
                     that.check2 = false;
-                    that.check3 = false;
                     that.watermark = '';
                     that.position = 0;
                     that.watermarkSelect(that.camera_id);
@@ -504,6 +512,24 @@ export default {
         calc(state, num) {
             return state ? (1 << num - 1) : 0;
         },
+        typeFormatter(row) {
+            if (row.type != 0)
+                return '动态水印'
+            return '自定义水印'
+        },
+        textFormatter(row, column, cellValue) {
+            let type = row.type;
+            if (type == 0) {
+                return cellValue;
+            } else if (type == 3) {
+                return "订单编号-工位"
+            } else if (type == 2) {
+                return "订单编号"
+            } else if (type == 1) {
+                return "工位"
+            }
+            return '';
+        }
     },
     watch: {
         addDialog(newV) {
@@ -520,15 +546,11 @@ export default {
             this.select(1, this.key);
         },
         check1() {
-            this.inputDisabled = this.check1 || this.check2 || this.check3;
+            this.inputDisabled = this.check1 || this.check2;
             this.position = 0;
         },
         check2() {
-            this.inputDisabled = this.check1 || this.check2 || this.check3;
-            this.position = 0;
-        },
-        check3() {
-            this.inputDisabled = this.check1 || this.check2 || this.check3;
+            this.inputDisabled = this.check1 || this.check2;
             this.position = 0;
         },
         watermark(newV) {
