@@ -11,7 +11,7 @@
                                 value-format="YYYY-MM-DD HH:mm:ss" />
                         </el-col>
                         <el-col :span="8">
-                            <el-input placeholder="搜索工位" v-model="stationId" />
+                            <el-input placeholder="搜索工位" v-model="stationName" />
                         </el-col>
                         <el-col :span="8">
                             <el-input placeholder="搜索工号" v-model="uid" />
@@ -47,7 +47,7 @@
                         </el-table-column>
                         <el-table-column prop="id" label="订单编号" sortable="costom" />
                         <el-table-column prop="scanTime" label="扫描时间" sortable="costom" />
-                        <el-table-column prop="station['id']" label="工位id" />
+                        <el-table-column prop="station['stationName']" label="工位名称" />
                         <el-table-column align="right">
                             <template #header>
                                 <el-button type="primary" round @click="renderAll" :disabled="allDisable">
@@ -93,6 +93,8 @@
                                 <el-button type="primary" circle :icon="Refresh" @click="Fresh(videoId)" />
                             </template>
                             <template #default="scope">
+                              <el-link target="_blank" :href="'/video/stream/' + scope.row.id" :disabled="scope.row.state != 2" :underline="false" style="margin: 0 10px" >
+                                <el-button type="success" :disabled="scope.row.state != 2" :icon="Download" circle></el-button></el-link>
                                 <el-button type="success" circle :icon="VideoPlay" @click="play(scope.row.id)"
                                     :disabled="scope.row.state != 2" />
                             </template>
@@ -113,7 +115,7 @@
 import { postRequest } from '@/utils/http';
 import { message } from '@/utils/messageBox';
 import { ref } from 'vue';
-import { Search, MoreFilled, VideoPlay, Refresh } from '@element-plus/icons-vue'
+import { Search, MoreFilled, VideoPlay, Refresh, Download } from '@element-plus/icons-vue'
 import router from '@/router/index'
 
 export default {
@@ -123,12 +125,12 @@ export default {
         let startTime = ref('');
         let endTime = ref('');
         let uid = ref('');
-        let stationId = ref('');
+        let stationName = ref('');
         let total = ref(0);
         let current_page = ref(1);
         let pageSize = ref(10);
-        let sortBy = ref("id");
-        let desc = ref(false);
+        let sortBy = ref("scanTime");
+        let desc = ref(true);
         let searchDialog = ref(false);
         let searchId = ref('')
         let multiple = ref([]);
@@ -140,12 +142,13 @@ export default {
 
 
         const select = () => {
+          console.log(sortBy.value)
             postRequest("/goods/select", {
                 id: id.value,
                 startTime: startTime.value,
                 endTime: endTime.value,
                 uid: uid.value,
-                stationId: stationId.value,
+                stationName: stationName.value,
                 page: current_page.value,
                 size: pageSize.value,
                 sortBy: sortBy.value,
@@ -185,7 +188,7 @@ export default {
             startTime,
             endTime,
             uid,
-            stationId,
+            stationName,
             total,
             current_page,
             pageSize,
@@ -203,6 +206,7 @@ export default {
             MoreFilled,
             VideoPlay,
             Refresh,
+            Download,
         }
     },
     methods: {

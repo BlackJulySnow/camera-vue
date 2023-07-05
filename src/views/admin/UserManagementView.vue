@@ -7,7 +7,7 @@
                     <h3>用户管理<el-button class="float-end" type="primary" plain @click="addDialog = true">新增</el-button>
                         <el-dialog v-model="addDialog" title="新增" width="30%">
                             <el-form label-position="right" label-width="100px" :model="form" style="max-width: 460px">
-                                <el-form-item label="工号">
+                                <el-form-item label="账号">
                                     <el-input v-model="form.id" />
                                 </el-form-item>
                                 <el-form-item label="姓名">
@@ -45,7 +45,7 @@
                                 {{ (current_page - 1) * pageSize + scope.$index + 1 }}
                             </template>
                         </el-table-column>
-                        <el-table-column prop="id" label="工号" sortable="custom" />
+                        <el-table-column prop="id" label="账号" sortable="custom" />
                         <el-table-column prop="name" label="姓名" sortable="custom" />
                         <el-table-column prop="enable" label="是否启用">
                             <template #default="scope">
@@ -67,7 +67,7 @@
                 </div>
                 <el-dialog v-model="editDialog" title="编辑" width="30%">
                     <el-form label-position="right" label-width="100px" :model="form" style="max-width: 460px">
-                        <el-form-item label="工号">
+                        <el-form-item label="账号">
                             <el-input v-model="form.id" disabled />
                         </el-form-item>
                         <el-form-item label="姓名">

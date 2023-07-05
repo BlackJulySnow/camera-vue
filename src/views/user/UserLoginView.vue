@@ -6,7 +6,7 @@
             <div class="form-container sign-in-container ">
                 <form action="#">
                     <h1>登录</h1>
-                    <input type="text" placeholder="工号" v-model="username" />
+                    <input type="text" placeholder="账号" v-model="username" />
                     <input type="password" placeholder="密码" v-model="password" />
                     <button @click="login">登录</button>
                 </form>

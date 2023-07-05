@@ -25,9 +25,16 @@
                                             :value="camera.value" />
                                     </el-select>
                                 </el-form-item>
-                                <el-form-item label="回溯时间">
-                                    <el-input v-model="form.delay" />
+                                <el-form-item label="回溯时长">
+                                  <el-select v-model="form.backtrack" class="m-2" placeholder="Select">
+                                    <el-option label="5秒" value="5"/>
+                                    <el-option label="10秒" value="10"/>
+                                    <el-option label="15秒" value="15"/>
+                                  </el-select>
                                 </el-form-item>
+                              <el-form-item label="水印延时">
+                                <el-input v-model="form.delay" />
+                              </el-form-item>
                             </el-form>
                             <template #footer>
                                 <span class="dialog-footer">
@@ -49,7 +56,7 @@
                         </el-table-column>
                         <el-table-column prop="ip" label="ip" sortable="costom" />
                         <el-table-column prop="port" label="端口" sortable="costom" />
-                        <el-table-column prop="backtrack" label="回溯时间" sortable="costom" />
+                        <el-table-column prop="backtrack" label="回溯时长" sortable="costom" />
                         <el-table-column prop="delay" label="延时" sortable="costom" />
                         <el-table-column prop="type" label="类型" :formatter="Formatter" />
                         <el-table-column prop="username" label="用户名" />
@@ -84,10 +91,15 @@
                                     :value="camera.value" />
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="回溯时间">
-                            <el-input v-model="form.backtrack" />
-                        </el-form-item>
-                        <el-form-item label="延时">
+                      <el-form-item label="回溯时长">
+                        <el-select v-model="form.backtrack" class="m-2" placeholder="Select">
+                          <el-option label="5秒" value="5"/>
+                          <el-option label="10秒" value="10"/>
+                          <el-option label="15秒" value="15"/>
+                          <el-option label="20秒" value="20"/>
+                        </el-select>
+                      </el-form-item>
+                        <el-form-item label="水印延时">
                             <el-input v-model="form.delay" />
                         </el-form-item>
                     </el-form>
@@ -360,6 +372,7 @@ export default {
                 port: that.form.port,
                 type: that.form.type,
                 delay: that.form.delay,
+                backtrack: that.form.backtrack,
             }, function success(resp) {
                 if (resp.code == '200') {
                     message('添加成功', 'success');
