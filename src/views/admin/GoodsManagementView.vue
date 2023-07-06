@@ -45,16 +45,20 @@
                                 {{ (current_page - 1) * pageSize + scope.$index + 1 }}
                             </template>
                         </el-table-column>
-                        <el-table-column prop="id" label="订单编号" sortable="costom" />
+                        <el-table-column prop="goodsId" label="订单编号" sortable="costom" />
                         <el-table-column prop="scanTime" label="扫描时间" sortable="costom" />
                         <el-table-column prop="station['stationName']" label="工位名称" />
                         <el-table-column align="right">
                             <template #header>
+                              <el-button type="danger" round @click="deleteAll" :disabled="allDisable">
+                                批量删除
+                              </el-button>
                                 <el-button type="primary" round @click="renderAll" :disabled="allDisable">
                                     批量渲染
                                 </el-button>
                             </template>
                             <template #default="scope">
+                              <el-button type="danger" @click="deleteGoods(scope.row.id)" :disabled="btnDisabled">订单删除</el-button>
                                 <el-button type="primary" @click="render(scope.row.id)" :disabled="btnDisabled"
                                     v-if="scope.row.videos.length == 0">开始渲染</el-button>
                                 <el-button type="success" @click="getVideoList(scope.row.id, scope.row.videos)"
@@ -122,6 +126,7 @@ export default {
     setup() {
         let goodsList = ref([]);
         let id = ref('');
+        let goodsId = ref('');
         let startTime = ref('');
         let endTime = ref('');
         let uid = ref('');
@@ -200,6 +205,7 @@ export default {
             videoList,
             videoListDialog,
             videoId,
+            goodsId,
             select,
             sortChange,
             Search,
@@ -220,8 +226,8 @@ export default {
         },
         render(id) {
             const that = this;
-            postRequest("/video/renderByGoodsIds", {
-                goodsIds: id,
+            postRequest("/video/renderByIds", {
+                ids: id,
             }, function success(resp) {
                 if (resp.code == '200') {
                     message(resp.msg, 'success');
@@ -232,6 +238,21 @@ export default {
             }, function error() {
                 message('添加渲染队列失败', 'error');
             })
+        },
+        deleteGoods(id) {
+          const that = this;
+          postRequest("/goods/delete", {
+            ids: id,
+          }, function success(resp) {
+            if (resp.code == '200') {
+              message(resp.msg, 'success');
+              that.select();
+            } else {
+              message(resp.msg, 'error');
+            }
+          }, function error() {
+            message('删除失败', 'error');
+          })
         },
         handleClose() {
             this.searchId = ''
@@ -260,6 +281,13 @@ export default {
                 multipleArray.push(i.id);
             }
             this.render(multipleArray.join());
+        },
+        deleteAll(){
+          let multipleArray = [];
+          for (let i of this.multiple.value) {
+            multipleArray.push(i.id);
+          }
+          this.deleteGoods(multipleArray.join());
         },
         getVideoList(id, list) {
             this.videoListDialog = true;
