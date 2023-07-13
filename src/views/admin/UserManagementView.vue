@@ -233,7 +233,9 @@ export default {
             }, function success(resp) {
                 if (resp.code == '200') {
                     that.select();
-                    message('删除成功', 'success');
+                    message(resp.msg, 'success');
+                }else{
+                  message(resp.msg,'warning')
                 }
             }, function error() {
                 message('删除失败', 'error');

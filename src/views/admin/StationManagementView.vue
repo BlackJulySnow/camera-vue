@@ -14,6 +14,16 @@
                                 <el-form-item label="工位名称">
                                     <el-input v-model="form.stationName" />
                                 </el-form-item>
+                              <el-form-item label="向前回溯时间">
+                                <el-input v-model="form.backtrack1" />
+                              </el-form-item>
+                              <el-form-item label="向后回溯时间">
+                                <el-input v-model="form.backtrack2" />
+                              </el-form-item>
+                              <el-form-item label="渲染超时时间">
+                                <el-input v-model="form.timeout" />
+                              </el-form-item>
+
                                 <el-form-item label="录像机">
                                     <el-select v-model="form.cameraId" placeholder="选择录像机">
                                         <el-option v-for="camera in cameraList" :key="camera.id" :label="camera.ip"
@@ -23,7 +33,7 @@
                                 <el-form-item label="通道">
                                     <el-select v-model="form.channels" placeholder="选择通道" multiple collapse-tags
                                         collapse-tags-tooltip :max-collapse-tags="2">
-                                        <el-option v-for="channel in channelList" :key="channel.id" :label="channel.channel"
+                                        <el-option v-for="channel in channelList" :key="channel.id" :label="channel.channelName"
                                             :value="channel.id" />
                                     </el-select>
                                 </el-form-item>
@@ -92,6 +102,9 @@ export default {
             channels: [],
             cameraId: '',
             cameraIp: '',
+            backtrack1: '',
+            backtrack2: '',
+            timeout: '',
         })
 
         let total = ref(0);
@@ -106,6 +119,7 @@ export default {
         let stationId = ref('');
 
         let addDialog = ref(false);
+        let justEdit = ref(false);
 
         const select = () => {
             postRequest("/station/select", {
@@ -167,6 +181,7 @@ export default {
             channelList,
             editFlag,
             stationId,
+            justEdit,
 
             Delete,
             Edit,
@@ -230,10 +245,14 @@ export default {
         },
         edit(station) {
             const that = this;
+            that.justEdit = true;
             that.addDialog = true;
             that.editFlag = true;
             that.form.stationIp = station.stationIp;
             that.form.stationName = station.stationName;
+            that.form.backtrack1 = station.backtrack1;
+            that.form.backtrack2 = station.backtrack2;
+            that.form.timeout = station.timeout;
             that.stationId = station.id;
             postRequest("/station/findStationChannel", {
                 id: station.id,
@@ -256,6 +275,9 @@ export default {
                 stationName: that.form.stationName,
                 stationIp: that.form.stationIp,
                 channels: channels,
+                backtrack1: that.form.backtrack1,
+                backtrack2: that.form.backtrack2,
+                timeout: that.form.timeout,
             }, function success(resp) {
                 if (resp.code == '200') {
                     message(resp.msg, 'success');
@@ -284,6 +306,11 @@ export default {
     watch: {
         "form.cameraId"(newV) {
             const that = this;
+            if (that.justEdit){
+              that.justEdit = false;
+            }else {
+              that.form.channels = [];
+            }
             postRequest("/channel/select", {
                 camera_id: newV,
             }, function success(resp) {

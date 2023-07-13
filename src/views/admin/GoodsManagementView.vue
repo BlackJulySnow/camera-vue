@@ -11,7 +11,7 @@
                                 value-format="YYYY-MM-DD HH:mm:ss" />
                         </el-col>
                         <el-col :span="8">
-                            <el-input placeholder="搜索工位" v-model="stationName" />
+                            <el-input placeholder="搜索工位名称" v-model="stationName" />
                         </el-col>
                         <el-col :span="8">
                             <el-input placeholder="搜索工号" v-model="uid" />
@@ -48,19 +48,19 @@
                         <el-table-column prop="goodsId" label="订单编号" sortable="costom" />
                         <el-table-column prop="scanTime" label="扫描时间" sortable="costom" />
                         <el-table-column prop="station['stationName']" label="工位名称" />
-                        <el-table-column align="right">
+                        <el-table-column align="right" width="300">
                             <template #header>
                               <el-button type="danger" round @click="deleteAll" :disabled="allDisable">
                                 批量删除
                               </el-button>
                                 <el-button type="primary" round @click="renderAll" :disabled="allDisable">
-                                    批量渲染
+                                    批量导出
                                 </el-button>
                             </template>
                             <template #default="scope">
                               <el-button type="danger" @click="deleteGoods(scope.row.id)" :disabled="btnDisabled">订单删除</el-button>
                                 <el-button type="primary" @click="render(scope.row.id)" :disabled="btnDisabled"
-                                    v-if="scope.row.videos.length == 0">开始渲染</el-button>
+                                    v-if="scope.row.videos.length == 0">开始导出</el-button>
                                 <el-button type="success" @click="getVideoList(scope.row.id, scope.row.videos)"
                                     v-else>视频列表</el-button>
                             </template>
@@ -236,7 +236,7 @@ export default {
                     message(resp.msg, 'error');
                 }
             }, function error() {
-                message('添加渲染队列失败', 'error');
+                message('添加导出队列失败', 'error');
             })
         },
         deleteGoods(id) {
@@ -296,15 +296,15 @@ export default {
         },
         stateFormatter(row, column, cellValue) {
             if (cellValue == 0) {
-                return "正在渲染队列中";
+                return "正在导出队列中";
             } else if (cellValue == 1) {
-                return "渲染中";
+                return "导出中";
             } else if (cellValue == 2) {
-                return "渲染完成";
+                return "导出完成";
             } else if (cellValue == 3) {
-                return "渲染错误";
+                return "导出错误";
             } else if (cellValue == 4) {
-                return "渲染结果已被删除";
+                return "导出结果已被删除";
             }
         },
         play(id) {

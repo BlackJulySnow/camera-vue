@@ -35,11 +35,11 @@
                         <el-table-column prop="createTime" label="创建时间" sortable="costom" :formatter="timeFormatter" />
                         <el-table-column prop="startTime" label="开始时间" sortable="costom" :formatter="timeFormatter" />
                         <el-table-column prop="endTime" label="结束时间" sortable="costom" :formatter="timeFormatter" />
-                        <el-table-column prop="renderStartTime" label="渲染开始时间" sortable="costom"
+                        <el-table-column prop="renderStartTime" label="导出开始时间" sortable="costom"
                             :formatter="timeFormatter" />
-                        <el-table-column prop="renderEndTime" label="渲染结束时间" sortable="costom" :formatter="timeFormatter" />
+                        <el-table-column prop="renderEndTime" label="导出结束时间" sortable="costom" :formatter="timeFormatter" />
                         <el-table-column prop="state" label="视频状态" :formatter="stateFormatter" />
-                        <el-table-column align="right" >
+                        <el-table-column align="right" width="200">
                             <template #default="scope">
 
                                 <el-button type="danger" @click="handleDelete(scope.row.id)"
@@ -53,6 +53,15 @@
                         </el-table-column>
                     </el-table>
                 </div>
+              <div class="card-footer">
+                <el-row justify="center">
+                  <el-row justify="center">
+                    <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="total"
+                                   :current_page="current_page" :page-sizes="[10, 50, 100]" :page-size="pageSize"
+                                   @current-change="handleCurrentChange" @size-change="handleSizeChange" />
+                  </el-row>
+                </el-row>
+              </div>
             </div>
         </div>
     </div>
@@ -75,7 +84,7 @@ export default {
         let total = ref(0);
         let current_page = ref(1);
         let pageSize = ref(10);
-        let sortBy = ref("id");
+        let sortBy = ref("createTime");
         let desc = ref(false);
         let playDialog = ref(false);
 
@@ -170,15 +179,15 @@ export default {
         },
         stateFormatter(row, column, cellValue) {
             if (cellValue == 0) {
-                return "正在渲染队列中";
+                return "正在导出队列中";
             } else if (cellValue == 1) {
-                return "渲染中";
+                return "导出中";
             } else if (cellValue == 2) {
-                return "渲染完成";
+                return "导出完成";
             } else if (cellValue == 3) {
-                return "渲染错误";
+                return "导出错误";
             } else if (cellValue == 4) {
-                return "渲染结果已被删除";
+                return "导出视频已被删除";
             }
         },
         handleDelete(id) {

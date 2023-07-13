@@ -13,23 +13,23 @@ export const stateType = [{
         value: -1,
     },
     {
-        label: "正在渲染队列中",
+        label: "正在导出队列中",
         value: 0,
     },
     {
-        label: "渲染中",
+        label: "导出中",
         value: 1,
     },
     {
-        label: "渲染完成",
+        label: "导出完成",
         value: 2,
     },
     {
-        label: "渲染错误",
+        label: "导出错误",
         value: 3,
     },
     {
-        label: "渲染结果已被删除",
+        label: "导出结果已被删除",
         value: 4,
     }
 ]
@@ -38,9 +38,9 @@ export const userRole = [{
     label: '员工',
     value: 'ROLE_USER'
 }, {
-    label: '部门经理',
+    label: '管理员',
     value: 'ROLE_MANAGE'
 }, {
-    label: '管理员',
+    label: '超级管理员',
     value: 'ROLE_ADMIN'
 }]
