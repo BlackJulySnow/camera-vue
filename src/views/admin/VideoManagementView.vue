@@ -85,7 +85,7 @@ export default {
         let current_page = ref(1);
         let pageSize = ref(10);
         let sortBy = ref("createTime");
-        let desc = ref(false);
+        let desc = ref(true);
         let playDialog = ref(false);
 
         const select = () => {

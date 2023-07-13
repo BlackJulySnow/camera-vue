@@ -223,7 +223,8 @@ export default {
                 channels: string,
             }, function success(resp) {
                 if (resp.code == '200') {
-                    message('添加成功', 'success');
+                    message(resp.msg, 'success');
+                    that.select();
                     that.handleClear();
                     that.addDialog = false;
                 } else {
