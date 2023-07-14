@@ -11,7 +11,7 @@
                                 value-format="YYYY-MM-DD HH:mm:ss" />
                         </el-col>
                         <el-col :span="8">
-                            <el-input placeholder="搜索工位" v-model="stationId" />
+                            <el-input placeholder="搜索工位名称" v-model="stationName" />
                         </el-col>
                         <el-col :span="8">
                             <el-input placeholder="搜索工号" v-model="uid" />
@@ -45,18 +45,22 @@
                                 {{ (current_page - 1) * pageSize + scope.$index + 1 }}
                             </template>
                         </el-table-column>
-                        <el-table-column prop="id" label="订单编号" sortable="costom" />
+                        <el-table-column prop="goodsId" label="订单编号" sortable="costom" />
                         <el-table-column prop="scanTime" label="扫描时间" sortable="costom" />
-                        <el-table-column prop="station['id']" label="工位id" />
-                        <el-table-column align="right">
+                        <el-table-column prop="station['stationName']" label="工位名称" />
+                        <el-table-column align="right" width="300">
                             <template #header>
+                              <el-button type="danger" round @click="deleteAll" :disabled="allDisable">
+                                批量删除
+                              </el-button>
                                 <el-button type="primary" round @click="renderAll" :disabled="allDisable">
-                                    批量渲染
+                                    批量导出
                                 </el-button>
                             </template>
                             <template #default="scope">
+                              <el-button type="danger" @click="deleteGoods(scope.row.id)" :disabled="btnDisabled">订单删除</el-button>
                                 <el-button type="primary" @click="render(scope.row.id)" :disabled="btnDisabled"
-                                    v-if="scope.row.videos.length == 0">开始渲染</el-button>
+                                    v-if="scope.row.videos.length == 0">开始导出</el-button>
                                 <el-button type="success" @click="getVideoList(scope.row.id, scope.row.videos)"
                                     v-else>视频列表</el-button>
                             </template>
@@ -93,6 +97,8 @@
                                 <el-button type="primary" circle :icon="Refresh" @click="Fresh(videoId)" />
                             </template>
                             <template #default="scope">
+                              <el-link target="_blank" :href="'/video/stream/' + scope.row.id" :disabled="scope.row.state != 2" :underline="false" style="margin: 0 10px" >
+                                <el-button type="success" :disabled="scope.row.state != 2" :icon="Download" circle></el-button></el-link>
                                 <el-button type="success" circle :icon="VideoPlay" @click="play(scope.row.id)"
                                     :disabled="scope.row.state != 2" />
                             </template>
@@ -113,22 +119,23 @@
 import { postRequest } from '@/utils/http';
 import { message } from '@/utils/messageBox';
 import { ref } from 'vue';
-import { Search, MoreFilled, VideoPlay, Refresh } from '@element-plus/icons-vue'
+import { Search, MoreFilled, VideoPlay, Refresh, Download } from '@element-plus/icons-vue'
 import router from '@/router/index'
 
 export default {
     setup() {
         let goodsList = ref([]);
         let id = ref('');
+        let goodsId = ref('');
         let startTime = ref('');
         let endTime = ref('');
         let uid = ref('');
-        let stationId = ref('');
+        let stationName = ref('');
         let total = ref(0);
         let current_page = ref(1);
         let pageSize = ref(10);
-        let sortBy = ref("id");
-        let desc = ref(false);
+        let sortBy = ref("scanTime");
+        let desc = ref(true);
         let searchDialog = ref(false);
         let searchId = ref('')
         let multiple = ref([]);
@@ -140,12 +147,13 @@ export default {
 
 
         const select = () => {
+          console.log(sortBy.value)
             postRequest("/goods/select", {
                 id: id.value,
                 startTime: startTime.value,
                 endTime: endTime.value,
                 uid: uid.value,
-                stationId: stationId.value,
+                stationName: stationName.value,
                 page: current_page.value,
                 size: pageSize.value,
                 sortBy: sortBy.value,
@@ -185,7 +193,7 @@ export default {
             startTime,
             endTime,
             uid,
-            stationId,
+            stationName,
             total,
             current_page,
             pageSize,
@@ -197,12 +205,14 @@ export default {
             videoList,
             videoListDialog,
             videoId,
+            goodsId,
             select,
             sortChange,
             Search,
             MoreFilled,
             VideoPlay,
             Refresh,
+            Download,
         }
     },
     methods: {
@@ -216,8 +226,8 @@ export default {
         },
         render(id) {
             const that = this;
-            postRequest("/video/renderByGoodsIds", {
-                goodsIds: id,
+            postRequest("/video/renderByIds", {
+                ids: id,
             }, function success(resp) {
                 if (resp.code == '200') {
                     message(resp.msg, 'success');
@@ -226,8 +236,23 @@ export default {
                     message(resp.msg, 'error');
                 }
             }, function error() {
-                message('添加渲染队列失败', 'error');
+                message('添加导出队列失败', 'error');
             })
+        },
+        deleteGoods(id) {
+          const that = this;
+          postRequest("/goods/delete", {
+            ids: id,
+          }, function success(resp) {
+            if (resp.code == '200') {
+              message(resp.msg, 'success');
+              that.select();
+            } else {
+              message(resp.msg, 'error');
+            }
+          }, function error() {
+            message('删除失败', 'error');
+          })
         },
         handleClose() {
             this.searchId = ''
@@ -257,6 +282,13 @@ export default {
             }
             this.render(multipleArray.join());
         },
+        deleteAll(){
+          let multipleArray = [];
+          for (let i of this.multiple.value) {
+            multipleArray.push(i.id);
+          }
+          this.deleteGoods(multipleArray.join());
+        },
         getVideoList(id, list) {
             this.videoListDialog = true;
             this.videoId = id;
@@ -264,15 +296,15 @@ export default {
         },
         stateFormatter(row, column, cellValue) {
             if (cellValue == 0) {
-                return "正在渲染队列中";
+                return "正在导出队列中";
             } else if (cellValue == 1) {
-                return "渲染中";
+                return "导出中";
             } else if (cellValue == 2) {
-                return "渲染完成";
+                return "导出完成";
             } else if (cellValue == 3) {
-                return "渲染错误";
+                return "导出错误";
             } else if (cellValue == 4) {
-                return "渲染结果已被删除";
+                return "导出结果已被删除";
             }
         },
         play(id) {

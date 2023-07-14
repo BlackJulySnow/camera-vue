@@ -25,9 +25,10 @@
                                             :value="camera.value" />
                                     </el-select>
                                 </el-form-item>
-                                <el-form-item label="回溯时间">
-                                    <el-input v-model="form.delay" />
-                                </el-form-item>
+
+                              <el-form-item label="水印延时">
+                                <el-input v-model="form.delay" />
+                              </el-form-item>
                             </el-form>
                             <template #footer>
                                 <span class="dialog-footer">
@@ -49,7 +50,6 @@
                         </el-table-column>
                         <el-table-column prop="ip" label="ip" sortable="costom" />
                         <el-table-column prop="port" label="端口" sortable="costom" />
-                        <el-table-column prop="backtrack" label="回溯时间" sortable="costom" />
                         <el-table-column prop="delay" label="延时" sortable="costom" />
                         <el-table-column prop="type" label="类型" :formatter="Formatter" />
                         <el-table-column prop="username" label="用户名" />
@@ -84,10 +84,7 @@
                                     :value="camera.value" />
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="回溯时间">
-                            <el-input v-model="form.backtrack" />
-                        </el-form-item>
-                        <el-form-item label="延时">
+                        <el-form-item label="水印延时">
                             <el-input v-model="form.delay" />
                         </el-form-item>
                     </el-form>
@@ -112,6 +109,7 @@
     </div>
     <el-dialog v-model="editChannel" title="编辑通道" width="30%">
         <el-table :data="channelList" style="width: 100%" height="540">
+          <el-table-column align="center" prop="channelName" label="通道名称" sortable />
             <el-table-column align="center" prop="channel" label="通道号" sortable />
             <el-table-column width="100" align="right">
                 <template #default="scope">
@@ -127,7 +125,8 @@
         </template>
     </el-dialog>
     <el-dialog v-model="addChannel" title="添加通道" width="30%">
-        <el-input v-model="channel" />
+        <el-input v-model="channel" placeholder="通道号"/>
+        <el-input v-model="channelName" placeholder="通道名称"/>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="addChannel = false">取消</el-button>
@@ -159,7 +158,7 @@
                 <span class="ml-3 w-35 text-gray-600 inline-flex items-center">水印文字</span>
             </el-col>
             <el-col :span="20">
-                <el-input v-model="watermark" label="水印文字" placeholder="不选择下列选项即可自定义文字" :disabled="inputDisabled" />
+                <el-input v-model="watermark" label="水印文字" placeholder="自定义水印文字" :disabled="inputDisabled" />
             </el-col>
         </el-row>
         <el-row :gutter="20" class="mt-4">
@@ -175,15 +174,15 @@
                 </el-select>
             </el-col>
         </el-row>
-        <el-row :gutter="20" class="mt-4">
-            <el-col :span="4">
-                <span class="ml-3 w-35 text-gray-600 inline-flex items-center">水印类型</span>
-            </el-col>
-            <el-col :span="20">
-                <el-checkbox v-model="check1" :disabled="checkboxDisabled">订单编号</el-checkbox>
-                <el-checkbox v-model="check2" :disabled="checkboxDisabled">工位</el-checkbox>
-            </el-col>
-        </el-row>
+<!--        <el-row :gutter="20" class="mt-4">-->
+<!--            <el-col :span="4">-->
+<!--                <span class="ml-3 w-35 text-gray-600 inline-flex items-center">水印类型</span>-->
+<!--            </el-col>-->
+<!--            <el-col :span="20">-->
+<!--                <el-checkbox v-model="check1" :disabled="checkboxDisabled">订单编号</el-checkbox>-->
+<!--                <el-checkbox v-model="check2" :disabled="checkboxDisabled">工位</el-checkbox>-->
+<!--            </el-col>-->
+<!--        </el-row>-->
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="addWatermark = false">取消</el-button>
@@ -210,7 +209,6 @@ export default {
             port: '',
             type: 0,
             delay: '',
-            backtrack: '',
         })
         let total = ref(0);
         let current_page = ref(1);
@@ -235,6 +233,7 @@ export default {
         let watermark = ref('');
         let inputDisabled = ref(false);
         let checkboxDisabled = ref(false);
+        let channelName = ref('');
 
         const select = () => {
             postRequest("/camera/select", {
@@ -309,6 +308,7 @@ export default {
             current_page,
             editChannel,
             channel,
+            channelName,
             select,
             sortChange,
             check1,
@@ -338,7 +338,6 @@ export default {
             that.form.port = '';
             that.form.type = 0;
             that.form.delay = '';
-            that.form.backtrack = '';
         },
         Formatter(row) {
             if (row.type == 0) {
@@ -362,7 +361,7 @@ export default {
                 delay: that.form.delay,
             }, function success(resp) {
                 if (resp.code == '200') {
-                    message('添加成功', 'success');
+                    message(resp.msg, 'success');
                 } else {
                     message(resp.msg, 'warning');
                 }
@@ -396,7 +395,6 @@ export default {
             that.form.port = camera.port;
             that.form.type = camera.type;
             that.form.delay = camera.delay;
-            that.form.backtrack = camera.backtrack;
             that.editDialog = true;
         },
         editUser() {
@@ -409,7 +407,6 @@ export default {
                 port: that.form.port,
                 type: that.form.type,
                 delay: that.form.delay,
-                backtrack: that.form.backtrack,
             }, function success(resp) {
                 if (resp.code == '200') {
                     message('修改成功', 'success');
@@ -442,11 +439,13 @@ export default {
             postRequest("/channel/add", {
                 channel: that.channel,
                 camera_id: that.camera_id,
+                channelName: that.channelName,
             }, function success(resp) {
                 if (resp.code == '200') {
                     message(resp.msg, 'success');
                     that.channelSelect(that.camera_id);
                     that.channel = '';
+                    that.channelName = '';
                     that.addChannel = false;
                 } else {
                     message(resp.msg, 'warning');
