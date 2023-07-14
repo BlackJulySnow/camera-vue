@@ -53,7 +53,7 @@
                                     style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
                             </template>
                         </el-table-column>
-                        <el-table-column prop="role" label="权限" :formatter="roleFormatter" />
+                        <el-table-column prop="role" label="权限" />
                         <el-table-column>
                             <template #header>
                                 <el-input v-model="key" placeholder="姓名关键字" />
@@ -147,8 +147,8 @@ export default {
                 if (resp.code == '200') {
                     total.value = resp.data.totalElements;
                     userList.value = resp.data.content;
-                } else {
-                    message(resp.msg, 'error');
+                }else{
+                  message(resp.msg, 'error');
                 }
             }, function error() {
                 message('查询失败', 'error');
@@ -269,15 +269,7 @@ export default {
             that.form.enable = user.enable;
             that.form.password = '';
             that.editDialog = true;
-        },
-        roleFormatter(row, column, cellValue) {
-            for (let i of userRole) {
-                if (i.value == cellValue) {
-                    return i.label
-                }
-            }
-        },
-
+        }
     },
     watch: {
         addDialog(newV) {
