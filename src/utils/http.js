@@ -1,7 +1,7 @@
 import $ from 'jquery'
 import store from '@/store'
 
-let base = window.location.protocol + '//' + window.location.hostname + ":8080"
+let base = window.location.protocol + '//' + window.location.hostname
 // let base = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port
 export const postRequest = (url, params, success, error) => {
     return $.ajax({

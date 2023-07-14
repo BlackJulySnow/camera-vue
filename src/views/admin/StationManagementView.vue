@@ -53,9 +53,20 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    <el-table :data="stationList" style="width: 100%" height="540">
-                        <el-table-column prop="stationName" label="工位名称" sortable />
-                        <el-table-column prop="stationIp" label="工位IP" sortable />
+                    <el-table :data="stationList" style="width: 100%" height="540" @sort-change="sortChange">
+                        <el-table-column label="序号">
+                            <template #default="scope">
+                                {{ (current_page - 1) * pageSize + scope.$index + 1 }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="stationName" label="工位名称" sortable="costom" />
+                        <el-table-column prop="stationIp" label="工位IP" sortable="costom" />
+                        <el-table-column prop="lastUploadTime" label="在线情况" sortable="costom">
+                            <template #default="scope">
+                                <el-button type="success" v-if="status(scope.row.lastUploadTime)">在线</el-button>
+                                <el-button type="danger" v-else>离线</el-button>
+                            </template>
+                        </el-table-column>
                         <el-table-column width="200" align="right">
                             <template #default="scope">
                                 <el-button type="primary" :icon="Edit" circle @click="edit(scope.row)" />
