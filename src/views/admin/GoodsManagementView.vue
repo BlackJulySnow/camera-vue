@@ -37,8 +37,8 @@
                     </el-row>
                 </div>
                 <div class="card-body">
-                    <el-table style="width: 100%" height="540" :data="goodsList" @sort-change="sortChange" ref="multiple"
-                        @selection-change="handleSelectionChange">
+                    <el-table style="width: 100%" height="540" :data="goodsList" @sort-change="sortChange"
+                        ref="multiple" @selection-change="handleSelectionChange">
                         <el-table-column type="selection" width="55" :selectable="selectable" />
                         <el-table-column label="序号">
                             <template #default="scope">
@@ -50,19 +50,21 @@
                         <el-table-column prop="station['stationName']" label="工位名称" />
                         <el-table-column align="right" width="300">
                             <template #header>
-                              <el-button type="danger" round @click="deleteAll" :disabled="allDisable">
-                                批量删除
-                              </el-button>
+                                <el-button type="danger" round @click="deleteAll" :disabled="allDisable">
+                                    批量删除
+                                </el-button>
                                 <el-button type="primary" round @click="renderAll" :disabled="allDisable">
                                     批量导出
                                 </el-button>
                             </template>
                             <template #default="scope">
-                              <el-button type="danger" @click="deleteGoods(scope.row.id)" :disabled="btnDisabled">订单删除</el-button>
+                                <el-button type="danger" @click="deleteGoods(scope.row.id)" :disabled="btnDisabled">订单删除
+                                </el-button>
                                 <el-button type="primary" @click="render(scope.row.id)" :disabled="btnDisabled"
                                     v-if="scope.row.videos.length == 0">开始导出</el-button>
-                                <el-button type="success" @click="getVideoList(scope.row.id, scope.row.videos)"
-                                    v-else>视频列表</el-button>
+                                <el-button type="success"
+                                    @click="getVideoList(scope.row.id, scope.row.videos, scope.$index)" v-else>视频列表
+                                </el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -97,8 +99,11 @@
                                 <el-button type="primary" circle :icon="Refresh" @click="Fresh(videoId)" />
                             </template>
                             <template #default="scope">
-                              <el-link target="_blank" :href="'/video/stream/' + scope.row.id" :disabled="scope.row.state != 2" :underline="false" style="margin: 0 10px" >
-                                <el-button type="success" :disabled="scope.row.state != 2" :icon="Download" circle></el-button></el-link>
+                                <el-link target="_blank" :href="'/video/stream/' + scope.row.id"
+                                    :disabled="scope.row.state != 2" :underline="false" style="margin: 0 10px">
+                                    <el-button type="success" :disabled="scope.row.state != 2" :icon="Download" circle>
+                                    </el-button>
+                                </el-link>
                                 <el-button type="success" circle :icon="VideoPlay" @click="play(scope.row.id)"
                                     :disabled="scope.row.state != 2" />
                             </template>
@@ -144,10 +149,11 @@ export default {
         let videoListDialog = ref(false);
         let videoList = ref([]);
         let videoId = ref('');
+        let goodsIndex = ref(0);
 
 
         const select = () => {
-          console.log(sortBy.value)
+            console.log(sortBy.value)
             postRequest("/goods/select", {
                 id: id.value,
                 startTime: startTime.value,
@@ -240,19 +246,19 @@ export default {
             })
         },
         deleteGoods(id) {
-          const that = this;
-          postRequest("/goods/delete", {
-            ids: id,
-          }, function success(resp) {
-            if (resp.code == '200') {
-              message(resp.msg, 'success');
-              that.select();
-            } else {
-              message(resp.msg, 'error');
-            }
-          }, function error() {
-            message('删除失败', 'error');
-          })
+            const that = this;
+            postRequest("/goods/delete", {
+                ids: id,
+            }, function success(resp) {
+                if (resp.code == '200') {
+                    message(resp.msg, 'success');
+                    that.select();
+                } else {
+                    message(resp.msg, 'error');
+                }
+            }, function error() {
+                message('删除失败', 'error');
+            })
         },
         handleClose() {
             this.searchId = ''
@@ -282,14 +288,15 @@ export default {
             }
             this.render(multipleArray.join());
         },
-        deleteAll(){
-          let multipleArray = [];
-          for (let i of this.multiple.value) {
-            multipleArray.push(i.id);
-          }
-          this.deleteGoods(multipleArray.join());
+        deleteAll() {
+            let multipleArray = [];
+            for (let i of this.multiple.value) {
+                multipleArray.push(i.id);
+            }
+            this.deleteGoods(multipleArray.join());
         },
-        getVideoList(id, list) {
+        getVideoList(id, list, index) {
+            this.goodsIndex = index;
             this.videoListDialog = true;
             this.videoId = id;
             this.videoList = list;
@@ -312,19 +319,12 @@ export default {
         },
         Fresh(id) {
             const that = this;
-            postRequest("/goods/select", {
+            postRequest("/video/selectByGoodsId", {
                 id: id,
-                startTime: that.startTime,
-                endTime: that.endTime,
-                uid: that.uid,
-                stationId: that.stationId,
-                page: that.current_page,
-                size: that.pageSize,
-                sortBy: that.sortBy,
-                desc: that.desc,
             }, function success(resp) {
                 if (resp.code == '200') {
-                    that.videoList = resp.data.content[0].videos;
+                    that.videoList = resp.data;
+                    that.goodsList[that.goodsIndex].videos = resp.data;
                 } else {
                     message(resp.msg, 'error');
                 }
@@ -343,4 +343,6 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

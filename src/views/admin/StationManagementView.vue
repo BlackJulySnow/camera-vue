@@ -6,7 +6,7 @@
                 <div class="card-header text-center">
                     <h3>工位管理
                         <el-button class="float-end" type="primary" plain @click="addDialog = true">新增</el-button>
-                        <el-dialog v-model="addDialog" title="新增" width="30%" @close="handleClear">
+                        <el-dialog v-model="addDialog" title="工位设置" width="30%" @close="handleClear">
                             <el-form label-position="right" label-width="100px" :model="form" style="max-width: 460px">
                                 <el-form-item label="工位IP">
                                     <el-input v-model="form.stationIp" />
@@ -14,15 +14,19 @@
                                 <el-form-item label="工位名称">
                                     <el-input v-model="form.stationName" />
                                 </el-form-item>
-                              <el-form-item label="向前回溯时间">
-                                <el-input v-model="form.backtrack1" />
-                              </el-form-item>
-                              <el-form-item label="向后回溯时间">
-                                <el-input v-model="form.backtrack2" />
-                              </el-form-item>
-                              <el-form-item label="渲染超时时间">
-                                <el-input v-model="form.timeout" />
-                              </el-form-item>
+                                <el-form-item label="工位扫描类型">
+                                    <el-input v-model="form.stationType" />
+                                </el-form-item>
+                                <el-form-item label="向前回溯时间">
+                                    <el-input v-model="form.backtrack1" />
+                                </el-form-item>
+                                <el-form-item label="向后回溯时间">
+                                    <el-input v-model="form.backtrack2" />
+                                </el-form-item>
+                                <el-form-item label="导出超时时间">
+                                    <el-input v-model="form.timeout" />
+                                </el-form-item>
+
 
                                 <el-form-item label="录像机">
                                     <el-select v-model="form.cameraId" placeholder="选择录像机">
@@ -33,8 +37,8 @@
                                 <el-form-item label="通道">
                                     <el-select v-model="form.channels" placeholder="选择通道" multiple collapse-tags
                                         collapse-tags-tooltip :max-collapse-tags="2">
-                                        <el-option v-for="channel in channelList" :key="channel.id" :label="channel.channelName"
-                                            :value="channel.id" />
+                                        <el-option v-for="channel in channelList" :key="channel.id"
+                                            :label="channel.channelName" :value="channel.id" />
                                     </el-select>
                                 </el-form-item>
                             </el-form>
@@ -61,6 +65,7 @@
                         </el-table-column>
                         <el-table-column prop="stationName" label="工位名称" sortable="costom" />
                         <el-table-column prop="stationIp" label="工位IP" sortable="costom" />
+                        <el-table-column prop="stationType" label="工位扫描类型" sortable="costom" />
                         <el-table-column prop="lastUploadTime" label="在线情况" sortable="costom">
                             <template #default="scope">
                                 <el-button type="success" v-if="status(scope.row.lastUploadTime)">在线</el-button>
@@ -105,6 +110,7 @@ export default {
             backtrack1: '',
             backtrack2: '',
             timeout: '',
+            stationType: '',
         })
 
         let total = ref(0);
@@ -117,6 +123,7 @@ export default {
         let desc = ref(false);
         let editFlag = ref(false);
         let stationId = ref('');
+        let stationType = ref('');
 
         let addDialog = ref(false);
         let justEdit = ref(false);
@@ -182,6 +189,7 @@ export default {
             editFlag,
             stationId,
             justEdit,
+            stationType,
 
             Delete,
             Edit,
@@ -221,6 +229,7 @@ export default {
                 stationName: that.form.stationName,
                 stationIp: that.form.stationIp,
                 channels: string,
+                stationType: that.form.stationType,
             }, function success(resp) {
                 if (resp.code == '200') {
                     message(resp.msg, 'success');
@@ -254,6 +263,7 @@ export default {
             that.form.backtrack1 = station.backtrack1;
             that.form.backtrack2 = station.backtrack2;
             that.form.timeout = station.timeout;
+            that.form.stationType = station.stationType;
             that.stationId = station.id;
             postRequest("/station/findStationChannel", {
                 id: station.id,
@@ -279,6 +289,7 @@ export default {
                 backtrack1: that.form.backtrack1,
                 backtrack2: that.form.backtrack2,
                 timeout: that.form.timeout,
+                stationType: that.form.stationType,
             }, function success(resp) {
                 if (resp.code == '200') {
                     message(resp.msg, 'success');
@@ -307,10 +318,10 @@ export default {
     watch: {
         "form.cameraId"(newV) {
             const that = this;
-            if (that.justEdit){
-              that.justEdit = false;
-            }else {
-              that.form.channels = [];
+            if (that.justEdit) {
+                that.justEdit = false;
+            } else {
+                that.form.channels = [];
             }
             postRequest("/channel/select", {
                 camera_id: newV,

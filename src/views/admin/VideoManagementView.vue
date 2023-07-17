@@ -1,7 +1,7 @@
 <template>
     <div class="row" style="width:100%; margin-top:30px">
-        <div class="col-1"></div>
-        <div class="col-10">
+        <div class="col-2"></div>
+        <div class="col-8">
             <div class="card">
                 <div class="card-header text-center">
                     <h3>视频管理</h3>
@@ -32,36 +32,43 @@
                                 {{ (current_page - 1) * pageSize + scope.$index + 1 }}
                             </template>
                         </el-table-column>
-                        <el-table-column prop="createTime" label="创建时间" sortable="costom" :formatter="timeFormatter" />
-                        <el-table-column prop="startTime" label="开始时间" sortable="costom" :formatter="timeFormatter" />
-                        <el-table-column prop="endTime" label="结束时间" sortable="costom" :formatter="timeFormatter" />
-                        <el-table-column prop="renderStartTime" label="导出开始时间" sortable="costom"
+                        <el-table-column prop="createTime" label="创建时间" width="200"  sortable="costom" :formatter="timeFormatter" />
+                        <!-- <el-table-column prop="startTime" label="开始时间" sortable="costom" :formatter="timeFormatter" />
+                        <el-table-column prop="endTime" label="结束时间" sortable="costom" :formatter="timeFormatter" /> -->
+                        <el-table-column prop="scope" label="视频时长" :formatter="videoTimeFormatter" width="80" />
+                        <!-- <el-table-column prop="renderStartTime" label="导出开始时间" sortable="costom"
                             :formatter="timeFormatter" />
-                        <el-table-column prop="renderEndTime" label="导出结束时间" sortable="costom" :formatter="timeFormatter" />
-                        <el-table-column prop="state" label="视频状态" :formatter="stateFormatter" />
+                        <el-table-column prop="renderEndTime" label="导出结束时间" sortable="costom"
+                            :formatter="timeFormatter" /> -->
+                        <el-table-column prop="goods.goodsId" label="单号" />
+                        <el-table-column prop="goods.station.stationName" label="工位名称" />
+                        <el-table-column prop="state" label="视频状态" :formatter="stateFormatter" sortable="costom" />
                         <el-table-column align="right" width="200">
                             <template #default="scope">
 
                                 <el-button type="danger" @click="handleDelete(scope.row.id)"
                                     v-if="scope.row.state != 4">删除</el-button>
                                 <el-button type="danger" @click="handleDelete(scope.row.id)" v-else>彻底删除</el-button>
-                              <el-link target="_blank" :href="'/video/stream/' + scope.row.id" :disabled="scope.row.state != 2" :underline="false" style="margin: 0 10px" >
-                                <el-button type="success" :disabled="scope.row.state != 2" :icon="Download" circle></el-button></el-link>
+                                <el-link target="_blank" :href="'/video/stream/' + scope.row.id"
+                                    :disabled="scope.row.state != 2" :underline="false" style="margin: 0 10px">
+                                    <el-button type="success" :disabled="scope.row.state != 2" :icon="Download" circle>
+                                    </el-button>
+                                </el-link>
                                 <el-button type="success" circle :icon="VideoPlay" @click="play(scope.row.id)"
                                     :disabled="scope.row.state != 2" />
                             </template>
                         </el-table-column>
                     </el-table>
                 </div>
-              <div class="card-footer">
-                <el-row justify="center">
-                  <el-row justify="center">
-                    <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="total"
-                                   :current_page="current_page" :page-sizes="[10, 50, 100]" :page-size="pageSize"
-                                   @current-change="handleCurrentChange" @size-change="handleSizeChange" />
-                  </el-row>
-                </el-row>
-              </div>
+                <div class="card-footer">
+                    <el-row justify="center">
+                        <el-row justify="center">
+                            <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="total"
+                                :current_page="current_page" :page-sizes="[10, 50, 100]" :page-size="pageSize"
+                                @current-change="handleCurrentChange" @size-change="handleSizeChange" />
+                        </el-row>
+                    </el-row>
+                </div>
             </div>
         </div>
     </div>
@@ -142,7 +149,7 @@ export default {
             stateType,
             playDialog,
             VideoPlay,
-          Download,
+            Download,
         }
     },
     methods: {
@@ -176,6 +183,12 @@ export default {
                 });
                 return format
             }
+        },
+        videoTimeFormatter(row, column) {
+            console.log(column);
+            let start = Date.parse(row.startTime);
+            let end = Date.parse(row.endTime);
+            return (end - start) / 1000;
         },
         stateFormatter(row, column, cellValue) {
             if (cellValue == 0) {
