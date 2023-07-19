@@ -4,11 +4,11 @@
     <div class="justify-content-md-center mt-8" v-if="!$store.state.user.pulling_info" style="width: 100%;">
         <div class="container right-panel-active" id="container">
             <div class="form-container sign-in-container ">
-                <form action="#">
+                <form @submit.prevent="login">
                     <h1>登录</h1>
                     <input type="text" placeholder="账号" v-model="username" />
                     <input type="password" placeholder="密码" v-model="password" />
-                    <button @click="login">登录</button>
+                    <button>登录</button>
                 </form>
             </div>
             <div class="overlay-container">
@@ -41,8 +41,9 @@ export default {
             store.commit("updateToken", data.jwtToken);
             store.dispatch("getinfo", {
                 success() {
+                    // console.log(store.state.user.from_page);
                     store.commit("updatePullingInfo", false);
-                    router.push({ name: 'home' });
+                    router.push( store.state.user.from_page);
                 },
             })
         } else {
@@ -55,7 +56,7 @@ export default {
                 password: password.value,
                 success() {
                     message("登录成功", "success");
-                    router.push({ name: 'home' });
+                    router.push({ name: "home" });
                 },
                 error(resp) {
                     message(resp.msg, "warning");

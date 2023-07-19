@@ -9,6 +9,7 @@ export default ({
         enable: "",
         is_login: false,
         pulling_info: false, // true
+        from_page:"",
     },
     getters: {},
     mutations: {
@@ -29,13 +30,18 @@ export default ({
             state.role = "";
             state.enable = "";
             state.is_login = false;
+            state.from_page = "";
         },
         updatePullingInfo(state, pulling_info) {
             state.pulling_info = pulling_info;
         },
+        updateFromPage(state, from_page){
+            state.from_page = from_page;
+        }
     },
     actions: {
         login(context, data) {
+            console.log('hello');
             loginRequest("/user/login", {
                     "id": data.username,
                     "password": data.password,
@@ -51,7 +57,7 @@ export default ({
                             enable: resp.data.enable,
                             is_login: true,
                         });
-                        data.success(resp);
+                        data.success();
                     } else {
                         data.error(resp);
                     }

@@ -100,6 +100,7 @@ import { Delete, Edit } from '@element-plus/icons-vue'
 
 export default {
     setup() {
+        console.log(111);
         let form = reactive({
             stationName: "",
             stationIp: "",

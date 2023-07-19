@@ -315,7 +315,9 @@ export default {
             }
         },
         play(id) {
-            router.push({ name: 'video_view', params: { id: id } });
+            // router.push({ name: 'video_view', params: { id: id } });
+            let routerUrl = router.resolve({ name: 'video_view', params: { id: id } });
+            window.open(routerUrl.href, "_blank");
         },
         Fresh(id) {
             const that = this;

@@ -28,6 +28,7 @@ export default {
         videoPlay,
     },
     setup() {
+
         const route = useRoute();
         let path = "/video/stream/" + route.params.id;
         const options = reactive({

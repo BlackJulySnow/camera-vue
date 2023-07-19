@@ -13,12 +13,8 @@ export const stateType = [{
         value: -1,
     },
     {
-        label: "正在导出队列中",
-        value: 0,
-    },
-    {
         label: "导出中",
-        value: 1,
+        value: 0,
     },
     {
         label: "导出完成",

@@ -32,16 +32,18 @@
                                 {{ (current_page - 1) * pageSize + scope.$index + 1 }}
                             </template>
                         </el-table-column>
-                        <el-table-column prop="createTime" label="创建时间" width="200"  sortable="costom" :formatter="timeFormatter" />
+                        <!-- <el-table-column prop="createTime" label="扫描时间" width="200" sortable="costom"
+                            :formatter="timeFormatter" /> -->
+                        <el-table-column prop="goods.scanTime" label="扫描时间" width="200"/>
                         <!-- <el-table-column prop="startTime" label="开始时间" sortable="costom" :formatter="timeFormatter" />
                         <el-table-column prop="endTime" label="结束时间" sortable="costom" :formatter="timeFormatter" /> -->
-                        <el-table-column prop="scope" label="视频时长" :formatter="videoTimeFormatter" width="80" />
+                        <!-- <el-table-column prop="scope" label="视频时长" :formatter="videoTimeFormatter" width="80" /> -->
                         <!-- <el-table-column prop="renderStartTime" label="导出开始时间" sortable="costom"
                             :formatter="timeFormatter" />
                         <el-table-column prop="renderEndTime" label="导出结束时间" sortable="costom"
                             :formatter="timeFormatter" /> -->
                         <el-table-column prop="goods.goodsId" label="单号" />
-                        <el-table-column prop="goods.station.stationName" label="工位名称" />
+                        <el-table-column prop="goods.station.stationName" label="扫描工位" />
                         <el-table-column prop="state" label="视频状态" :formatter="stateFormatter" sortable="costom" />
                         <el-table-column align="right" width="200">
                             <template #default="scope">
@@ -184,12 +186,12 @@ export default {
                 return format
             }
         },
-        videoTimeFormatter(row, column) {
-            console.log(column);
-            let start = Date.parse(row.startTime);
-            let end = Date.parse(row.endTime);
-            return (end - start) / 1000;
-        },
+        // videoTimeFormatter(row, column) {
+        //     console.log(column);
+        //     let start = Date.parse(row.startTime);
+        //     let end = Date.parse(row.endTime);
+        //     return (end - start) / 1000;
+        // },
         stateFormatter(row, column, cellValue) {
             if (cellValue == 0) {
                 return "正在导出队列中";
@@ -219,7 +221,9 @@ export default {
             })
         },
         play(id) {
-            router.push({ name: 'video_view', params: { id: id } });
+            let routerUrl = router.resolve({ name: 'video_view', params: { id: id } });
+            console.log(routerUrl.href);
+            window.open(routerUrl.href, "_blank");
         },
     },
 }

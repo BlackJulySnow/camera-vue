@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" v-if="route_name != 'video_view'">
         <div class="container">
             <router-link class="navbar-brand" :to="{ name: 'home' }">
                 <img src="@/assets/logo.png" alt="" width="28" height="28" class="d-inline-block align-text-top">
@@ -87,6 +87,7 @@ export default {
     setup() {
         const store = useStore();
         const route = useRoute();
+        console.log(store);
         let route_name = computed(() => route.name)
         const logout = () => {
             store.dispatch("logout");

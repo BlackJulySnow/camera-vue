@@ -25,7 +25,7 @@ const routes = [{
         name: "video_view",
         component: VideoView,
         meta: {
-            requestAuth: true,
+            requestAuth: false,
             title: "视频预览",
         }
     },
@@ -109,6 +109,10 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+    console.log(to.params, to.path);
+    if(to.name != "user_login"){
+        store.commit("updateFromPage", to.path);
+    }
     if (to.meta.title) {
         document.title = to.meta.title
     }
@@ -116,6 +120,7 @@ router.beforeEach((to, from, next) => {
         next({ name: "user_login" });
 
     } else {
+        
         next();
     }
 })
