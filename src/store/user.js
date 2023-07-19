@@ -41,7 +41,6 @@ export default ({
     },
     actions: {
         login(context, data) {
-            console.log('hello');
             loginRequest("/user/login", {
                     "id": data.username,
                     "password": data.password,

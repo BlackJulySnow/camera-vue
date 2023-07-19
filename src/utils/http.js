@@ -1,8 +1,14 @@
 import $ from 'jquery'
 import store from '@/store'
 
-let base = window.location.protocol + '//' + window.location.hostname
-// let base = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port
+let base;
+console.log(process.env.NODE_ENV);
+if(process.env.NODE_ENV === 'development'){//如果是开发环境
+    base = window.location.protocol + '//' + window.location.hostname;
+    console.log(base);
+}else{
+    base = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port
+}
 export const postRequest = (url, params, success, error) => {
     return $.ajax({
         url: base + url,
