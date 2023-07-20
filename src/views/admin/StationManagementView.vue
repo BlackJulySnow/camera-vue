@@ -303,6 +303,8 @@ export default {
             })
         },
         status(value) {
+            if(value == undefined)
+                return false;
             let last = new Date(value);
             let now = new Date();
             let state;

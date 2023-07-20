@@ -194,7 +194,7 @@ export default {
         // },
         stateFormatter(row, column, cellValue) {
             if (cellValue == 0) {
-                return "正在导出队列中";
+                return "导出中";
             } else if (cellValue == 1) {
                 return "导出中";
             } else if (cellValue == 2) {
