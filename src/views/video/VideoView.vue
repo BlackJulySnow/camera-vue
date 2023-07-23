@@ -7,30 +7,34 @@
                     <span>视频预览</span>
                 </div>
                 <div class="card-body">
-                    <videoPlay v-bind="options" @play="onPlay" @pause="onPause">
+                    <videoPlay id="videoPlayer" v-bind="options" @play="onPlay" @pause="onPause">
                         <h1>暂不支持video标签</h1>
                     </videoPlay>
                 </div>
+                <el-slider range :max="100" @input="changeProcess" />
+                <el-button type="success" @click="submit">确认导出</el-button>
             </div>
         </div>
     </div>
-    <div class="col-2"></div>
 </template>
 <script>
 import "video.js/dist/video-js.css";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import 'vue3-video-play/dist/style.css'
 import { videoPlay } from 'vue3-video-play'
+import { base, pureRequest } from '@/utils/http'
+import { message } from '@/utils/messageBox';
+import router from '@/router/index'
 
 export default {
     components: {
         videoPlay,
     },
     setup() {
-
+        const value = ref([0, 100]);
         const route = useRoute();
-        let path = "/video/stream/" + route.params.id;
+        let path = base + "/video/stream/" + route.params.id;
         const options = reactive({
             width: "100%", //播放器高度
             height: "100", //播放器高度
@@ -63,10 +67,49 @@ export default {
             console.log('暂停')
         }
 
+
         return {
             options,
             onPlay,
             onPause,
+            value,
+            route,
+        }
+
+    },
+    methods: {
+        change(val) {
+            if (document.getElementById('videoPlayer')) {
+                let videoPlayer = document.getElementById('videoPlayer');
+                let videoLength = videoPlayer.duration;
+                videoPlayer.currentTime = videoLength / 100 * val;
+                // videoPlayer.pause();
+            }
+        },
+        changeProcess(val) {
+            if (val[0] == this.value[0]) {
+                this.change(val[1]);
+            } else {
+                this.change(val[0]);
+            }
+            this.value = val;
+        },
+        submit() {
+            const that = this;
+            pureRequest("/video/renderByVideoProcess", {
+                id: that.route.params.id,
+                process1: that.value[0],
+                process2: that.value[1],
+            }, function success(resp) {
+                if (resp.code == '200') {
+                    message(resp.msg, 'success');
+                    router.push({ name: 'admin_video_management', params: {} });
+                } else {
+                    message(resp.msg, 'error');
+                }
+            }, function error(resp) {
+                message(resp.msg, 'error');
+            })
         }
     }
 }
