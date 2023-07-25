@@ -27,7 +27,9 @@
                                 </el-form-item>
 
                               <el-form-item label="水印延时">
-                                <el-input v-model="form.delay" />
+                                <el-input v-model="form.delay" placeholder="单位毫秒">
+                                    <template #append>毫秒</template>
+                                </el-input>
                               </el-form-item>
                             </el-form>
                             <template #footer>
@@ -85,7 +87,9 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="水印延时">
-                            <el-input v-model="form.delay" />
+                            <el-input v-model="form.delay" placeholder="单位毫秒">
+                                <template #append>毫秒</template>
+                            </el-input>
                         </el-form-item>
                     </el-form>
                     <template #footer>
