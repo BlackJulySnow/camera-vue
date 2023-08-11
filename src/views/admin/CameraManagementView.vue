@@ -123,6 +123,7 @@
         </el-table>
         <template #footer>
             <span class="dialog-footer">
+                <el-button @click="autoDetect">通道检测</el-button>
                 <el-button type="success" @click="addChannel = true">增加</el-button>
                 <el-button type="primary" @click="editChannel = false">确认</el-button>
             </span>
@@ -133,6 +134,7 @@
         <el-input v-model="channelName" placeholder="通道名称"/>
         <template #footer>
             <span class="dialog-footer">
+                
                 <el-button @click="addChannel = false">取消</el-button>
                 <el-button type="primary" @click="addChannelFunc">确认</el-button>
             </span>
@@ -456,6 +458,19 @@ export default {
                 }
             }, function error() {
                 message('添加失败', 'error');
+            })
+        },
+        autoDetect(){
+            const that = this;
+            postRequest("/channel/autoDetect", {
+                camera_id: that.camera_id,
+            }, function success(resp){
+                if(resp.code == '200'){
+                    message(resp.msg, 'success');
+                    that.channelSelect(that.camera_id);
+                }else{
+                    message(resp.msg, 'warning');
+                }
             })
         },
         watermarkSelect(id) {
