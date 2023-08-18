@@ -33,10 +33,7 @@ export const stateType = [{
 export const userRole = [{
     label: '员工',
     value: 'ROLE_USER'
-}, {
+},{
     label: '管理员',
-    value: 'ROLE_MANAGE'
-}, {
-    label: '超级管理员',
     value: 'ROLE_ADMIN'
 }]

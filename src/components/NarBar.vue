@@ -11,22 +11,19 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item md-2"
-                        v-if="$store.state.user.role == 'ROLE_ADMIN' || $store.state.user.role == 'ROLE_MANAGE'">
+                    <li class="nav-item md-2">
                         <router-link
                             :class="route_name == 'admin_goods_management' ? 'nav-link active mleft' : 'mleft nav-link'"
                             aria-current="page" :to="{ name: 'admin_goods_management' }">
                             订单管理</router-link>
                     </li>
-                    <li class="nav-item md-2"
-                        v-if="$store.state.user.role == 'ROLE_ADMIN' || $store.state.user.role == 'ROLE_MANAGE'">
+                    <li class="nav-item md-2">
                         <router-link
                             :class="route_name == 'admin_video_management' ? 'nav-link active mleft' : 'mleft nav-link'"
                             aria-current="page" :to="{ name: 'admin_video_management' }">
                             视频管理</router-link>
                     </li>
-                    <li class="nav-item md-2"
-                        v-if="$store.state.user.role == 'ROLE_ADMIN' || $store.state.user.role == 'ROLE_MANAGE'">
+                    <li class="nav-item md-2">
                         <router-link
                             :class="route_name == 'admin_station_management' ? 'nav-link active mleft' : 'mleft nav-link'"
                             aria-current="page" :to="{ name: 'admin_station_management' }">

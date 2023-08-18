@@ -6,22 +6,40 @@
                 <div class="card-header text-center">
                     <h3>视频管理</h3>
                     <el-row :gutter="20">
-                        <el-col :span="6">
-                            <el-date-picker v-model="startTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss"
-                                placeholder="开始时间" />
+                        <el-col :span="8">
+                            <el-date-picker v-model="startTime" type="datetime" placeholder="开始时间"
+                                value-format="YYYY-MM-DD HH:mm:ss" />
                         </el-col>
-                        <el-col :span="6">
-                            <el-date-picker v-model="endTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss"
-                                placeholder="结束时间" />
+                        <el-col :span="8">
+                            <el-input placeholder="搜索工位名称" v-model="stationName" />
                         </el-col>
-                        <el-col :span="6">
+                        <!-- <el-col :span="8">
+                            <el-input placeholder="搜索工号" v-model="uid" />
+                        </el-col> -->
+                        <el-col :span="8">
                             <el-select placeholder="视频状态" v-model="state">
                                 <el-option v-for="Type in stateType" :key="Type.value" :label="Type.label"
                                     :value="Type.value" />
                             </el-select>
                         </el-col>
-                        <el-col :span="6">
+                        <!-- <el-col :span="6">
                             <el-button :icon="Search" circle type="primary" @click="select()" />
+                        </el-col> -->
+                    </el-row>
+                    <el-row class="mt-2" :gutter="20">
+                        <el-col :span="8">
+                            <el-date-picker v-model="endTime" type="datetime" placeholder="结束时间"
+                                value-format="YYYY-MM-DD HH:mm:ss" />
+                        </el-col>
+                        <el-col :span="8">
+                            <el-input placeholder="搜索订单(英文逗号分割批量搜索)" v-model="id">
+                                <template #append>
+                                    <el-button @click="searchDialog = true">批量搜索</el-button>
+                                </template>
+                            </el-input>
+                        </el-col>
+                        <el-col :span="8">
+                            <el-button :icon="Search" circle type="success" @click="select()" />
                         </el-col>
                     </el-row>
                 </div>
@@ -74,6 +92,17 @@
             </div>
         </div>
     </div>
+    <el-dialog v-model="searchDialog" title="批量搜索(每个订单号以回车分割)" width="30%" @close="handleClose">
+                    <el-input v-model="searchId" :autosize="{ minRows: 8, maxRows: 16 }" type="textarea" />
+                    <template #footer>
+                        <span class="dialog-footer">
+                            <el-button @click="searchDialog = false">取消</el-button>
+                            <el-button type="primary" @click="search()">
+                                搜索
+                            </el-button>
+                        </span>
+                    </template>
+                </el-dialog>
 </template>
 <script>
 
@@ -96,6 +125,10 @@ export default {
         let sortBy = ref("createTime");
         let desc = ref(true);
         let playDialog = ref(false);
+        let stationName = ref("");
+        let searchDialog = ref(false);
+        let id = ref("");
+        let searchId = ref("");
 
         const select = () => {
             postRequest("/video/select", {
@@ -106,6 +139,8 @@ export default {
                 size: pageSize.value,
                 sortBy: sortBy.value,
                 desc: desc.value,
+                stationName: stationName.value,
+                goods_ids: id.value,
             }, function success(resp) {
                 if (resp.code == '200') {
                     videoList.value = resp.data.content;
@@ -152,6 +187,10 @@ export default {
             playDialog,
             VideoPlay,
             Download,
+            stationName,
+            searchDialog,
+            id,
+            searchId,
         }
     },
     methods: {
@@ -224,6 +263,12 @@ export default {
             let routerUrl = router.resolve({ name: 'video_view', params: { id: id } });
             console.log(routerUrl.href);
             window.open(routerUrl.href, "_blank");
+        },
+        search() {
+            this.searchId = this.searchId.replace(/\n/g, ",");
+            this.id = this.searchId;
+            this.select()
+            this.searchDialog = false;
         },
     },
 }
