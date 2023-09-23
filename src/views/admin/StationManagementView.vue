@@ -17,15 +17,20 @@
                                 <el-form-item label="工位扫描类型">
                                     <el-input v-model="form.stationType" />
                                 </el-form-item>
+                                <el-form-item label="字体大小">
+                                    <el-input v-model="form.fontSize" />
+                                </el-form-item>
+                                
                                 <el-form-item label="向前回溯时间">
                                     <el-input v-model="form.backtrack1" />
                                 </el-form-item>
                                 <el-form-item label="向后回溯时间">
                                     <el-input v-model="form.backtrack2" />
                                 </el-form-item>
-                                <el-form-item label="导出超时时间">
-                                    <el-input v-model="form.timeout" />
+                                <el-form-item label="水印颜色">
+                                    <el-color-picker v-model="form.color" />
                                 </el-form-item>
+
 
 
                                 <el-form-item label="录像机">
@@ -109,7 +114,8 @@ export default {
             cameraIp: '',
             backtrack1: '',
             backtrack2: '',
-            timeout: '',
+            color: ref('#FFFFFF'),
+            fontSize: ref(30),
             stationType: '',
         })
 
@@ -262,7 +268,8 @@ export default {
             that.form.stationName = station.stationName;
             that.form.backtrack1 = station.backtrack1;
             that.form.backtrack2 = station.backtrack2;
-            that.form.timeout = station.timeout;
+            that.form.color = station.color;
+            that.form.fontSize = station.fontSize;
             that.form.stationType = station.stationType;
             that.stationId = station.id;
             postRequest("/station/findStationChannel", {
@@ -288,7 +295,8 @@ export default {
                 channels: channels,
                 backtrack1: that.form.backtrack1,
                 backtrack2: that.form.backtrack2,
-                timeout: that.form.timeout,
+                color: that.form.color,
+                fontSize: that.form.fontSize,
                 stationType: that.form.stationType,
             }, function success(resp) {
                 if (resp.code == '200') {
